@@ -14,142 +14,147 @@
             margin: 0;
             padding: 0;
             font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #8FBC8F 0%, #98D982 50%, #90EE90 100%);
+            background: linear-gradient(135deg, #90C695 0%, #A8E6A3 50%, #7FB069 100%);
             color: white;
-            overflow-y: auto !important;
-            overflow-x: hidden;
-            touch-action: pan-y;
-            -webkit-overflow-scrolling: touch;
-            min-height: 100%;
-        }
-        
-        body {
-            height: auto !important;
-            min-height: 720px;
+            overflow: hidden;
+            touch-action: manipulation;
+            height: 100vh;
+            width: 100vw;
         }
         
         .mobile-container {
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: space-between;
+            height: 100vh;
+            width: 100vw;
             padding: 10px;
-            max-width: 500px;
+            max-width: 400px;
             margin: 0 auto;
-            min-height: 600px;
-            height: auto;
-            justify-content: flex-start;
-            gap: 15px;
         }
         
-        .game-controls {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            align-items: center;
-        }
-        
-        .control-row {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-        }
-        
-        .control-row.second {
-            gap: 30px;
+        .game-header {
+            width: 100%;
+            text-align: center;
+            margin-bottom: 10px;
         }
         
         .score-info {
-            background: rgba(0, 0, 0, 0.7);
-            padding: 15px;
-            border-radius: 10px;
-            border: 2px solid rgba(255, 255, 255, 0.8);
+            background: rgba(95, 115, 140, 0.85);
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 2px solid rgba(140, 160, 190, 0.6);
             width: 100%;
-            text-align: center;
-            backdrop-filter: blur(5px);
+            backdrop-filter: blur(10px);
         }
         
         .score-row {
             display: flex;
             justify-content: space-around;
-            margin-bottom: 10px;
-        }
-        
-        .score, .level, .lines {
-            font-size: 16px;
+            font-size: 14px;
             font-weight: bold;
         }
         
         .game-board {
-            background: rgba(0, 0, 0, 0.7);
-            border: 2px solid rgba(255, 255, 255, 0.8);
-            border-radius: 10px;
+            background: rgba(95, 115, 140, 0.9);
+            border: 3px solid rgba(140, 160, 190, 0.8);
+            border-radius: 12px;
             padding: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            backdrop-filter: blur(5px);
-            width: 240px;
-            height: 360px;
-            flex-shrink: 0;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 25px rgba(70, 85, 105, 0.4);
+            flex: 1;
+            max-height: 60vh;
+            margin: 10px 0;
         }
         
         canvas {
             display: block;
-            background: #000;
-            border-radius: 5px;
-            max-width: 100%;
-            height: auto;
+            background: #111;
+            border-radius: 8px;
+            width: 100%;
+            height: 100%;
+            max-width: 280px;
+            max-height: 448px;
         }
         
-        // 移除舊的控制相關CSS
-        .game-area {
-            display: none;
+        .game-controls {
+            width: 100%;
+            padding: 15px;
+            background: rgba(95, 115, 140, 0.7);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(140, 160, 190, 0.5);
         }
         
-        .left-controls {
-            display: none;
+        .control-row {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 12px;
         }
         
-        .right-controls {
-            display: none;
-        }
-        
-        .mobile-controls {
-            display: none;
+        .control-row:last-child {
+            margin-bottom: 0;
         }
         
         .control-btn {
-            background: linear-gradient(45deg, #4CAF50, #45a049);
+            background: linear-gradient(145deg, #EFC7C7, #D8A99B);
             color: white;
             border: none;
-            border-radius: 12px;
-            font-size: 14px;
+            border-radius: 15px;
+            font-size: 16px;
             font-weight: bold;
             cursor: pointer;
             user-select: none;
             transition: all 0.2s;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 15px rgba(70, 85, 105, 0.3);
             touch-action: manipulation;
-            width: 60px;
-            height: 50px;
+            min-height: 55px;
+            width: 90px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .control-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255,255,255,0.2), transparent);
+            opacity: 0;
+            transition: opacity 0.2s;
         }
         
         .control-btn:active {
             transform: scale(0.95);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            box-shadow: 0 2px 8px rgba(70, 85, 105, 0.4);
+        }
+        
+        .control-btn:active::before {
+            opacity: 1;
         }
         
         .rotate-btn {
-            background: linear-gradient(45deg, #FF6B6B, #ee5a5a);
+            background: linear-gradient(145deg, #6bb3d4, #45a2c7);
+            width: 110px;
         }
         
         .drop-btn {
-            background: linear-gradient(45deg, #FFD93D, #f5cd1f);
-            color: #333;
+            background: linear-gradient(145deg, #C9B4C7, #D9B3E2);
+            color: #2F2F2F;
+            width: 120px;
         }
         
         .pause-btn {
-            background: linear-gradient(45deg, #9B59B6, #8E44AD);
+            background: linear-gradient(145deg, #FAD28A, #FAD28A);
+            color: #5D4E37;
+            width: 90px;
         }
         
         .game-over {
@@ -157,37 +162,28 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.95);
+            background: rgba(95, 115, 140, 0.95);
             color: white;
             padding: 30px;
             border-radius: 20px;
             text-align: center;
-            border: 3px solid #ff6b6b;
+            border: 3px solid #D2691E;
             display: none;
-            max-width: 90%;
+            max-width: 90vw;
             z-index: 1000;
+            backdrop-filter: blur(10px);
         }
         
         .restart-btn {
-            background: linear-gradient(45deg, #4CAF50, #45a049);
+            background: linear-gradient(145deg, #7FB069, #6B9B47);
             color: white;
             border: none;
             padding: 15px 30px;
             font-size: 18px;
             cursor: pointer;
-            border-radius: 10px;
+            border-radius: 12px;
             margin-top: 20px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-        }
-        
-        .instructions {
-            background: rgba(0, 0, 0, 0.7);
-            border-radius: 10px;
-            padding: 12px;
-            text-align: center;
-            font-size: 14px;
-            border: 1px solid rgba(255,255,255,0.5);
-            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 15px rgba(70, 85, 105, 0.3);
         }
         
         .paused-overlay {
@@ -195,93 +191,123 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(95, 115, 140, 0.95);
             color: white;
             padding: 30px;
             border-radius: 20px;
             text-align: center;
             display: none;
             z-index: 999;
-            border: 2px solid #FFD93D;
+            border: 2px solid #F4E4BC;
+            backdrop-filter: blur(10px);
         }
         
-        @media (max-width: 480px) {
+        .instructions {
+            background: rgba(95, 115, 140, 0.6);
+            border-radius: 8px;
+            padding: 8px;
+            text-align: center;
+            font-size: 12px;
+            border: 1px solid rgba(140, 160, 190, 0.5);
+            backdrop-filter: blur(5px);
+            margin-top: 8px;
+        }
+        
+        /* 超小屏幕優化 */
+        @media (max-height: 600px) {
             .mobile-container {
-                padding: 3px;
+                padding: 5px;
+            }
+            
+            .game-board {
+                max-height: 50vh;
+                margin: 5px 0;
             }
             
             .control-btn {
-                font-size: 15px;
-            }
-            
-            .move-btn {
-                width: 65px;
-                height: 45px;
-            }
-            
-            .rotate-btn {
-                width: 85px;
-                height: 45px;
-            }
-            
-            .drop-btn {
-                width: 100px;
-                height: 45px;
-            }
-            
-            .pause-btn {
-                width: 80px;
-                height: 40px;
+                min-height: 45px;
                 font-size: 14px;
             }
             
-            .game-info {
-                padding: 8px;
+            .instructions {
+                font-size: 11px;
+                padding: 6px;
+            }
+        }
+        
+        /* 橫屏適配 */
+        @media (orientation: landscape) and (max-height: 500px) {
+            .mobile-container {
+                flex-direction: row;
+                align-items: stretch;
+                gap: 10px;
             }
             
-            .mobile-controls {
-                padding: 12px;
+            .game-board {
+                flex: 2;
+                margin: 0;
+                max-height: 90vh;
+            }
+            
+            .game-side {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                min-width: 200px;
+            }
+            
+            .game-controls {
+                flex: 1;
             }
             
             .control-row {
-                margin-bottom: 8px;
                 gap: 10px;
+                margin-bottom: 10px;
+            }
+            
+            .control-btn {
+                min-height: 50px;
             }
         }
     </style>
 </head>
 <body>
     <div class="mobile-container">
+        <!-- 遊戲頭部資訊 -->
+        <div class="game-header">
+            <div class="score-info">
+                <div class="score-row">
+                    <div class="score">分數: <span id="score">0</span></div>
+                    <div class="level">等級: <span id="level">1</span></div>
+                    <div class="lines">行數: <span id="lines">0</span></div>
+                </div>
+            </div>
+        </div>
+        
         <!-- 遊戲區域 -->
         <div class="game-board">
-            <canvas id="gameCanvas" width="200" height="320"></canvas>
+            <canvas id="gameCanvas" width="280" height="448"></canvas>
         </div>
         
-        <!-- 控制按鈕 -->
-        <div class="game-controls">
-            <div class="control-row">
-                <button class="control-btn" id="leftBtn">←</button>
-                <button class="control-btn rotate-btn" id="rotateBtn">轉</button>
-                <button class="control-btn" id="rightBtn">→</button>
+        <!-- 側邊欄（橫屏時使用） -->
+        <div class="game-side">
+            <!-- 控制按鈕 -->
+            <div class="game-controls">
+                <div class="control-row">
+                    <button class="control-btn" id="leftBtn">←</button>
+                    <button class="control-btn rotate-btn" id="rotateBtn">🔄</button>
+                    <button class="control-btn" id="rightBtn">→</button>
+                </div>
+                <div class="control-row">
+                    <button class="control-btn pause-btn" id="pauseBtn">⏸️</button>
+                    <button class="control-btn drop-btn" id="dropBtn">⬇️</button>
+                </div>
+                <div class="instructions">
+                    🎮 <strong>左右移動 • 旋轉 • 快降 • 暫停</strong><br>
+                    💡 經常遊玩有助於保持大腦活力
+                </div>
             </div>
-            <div class="control-row second">
-                <button class="control-btn pause-btn" id="pauseBtn">暫停</button>
-                <button class="control-btn drop-btn" id="dropBtn">↓</button>
-            </div>
-        </div>
-        
-        <!-- 分數資訊 -->
-        <div class="score-info">
-            <div class="score-row">
-                <div class="score">分數: <span id="score">0</span></div>
-                <div class="level">等級: <span id="level">1</span></div>
-                <div class="lines">行數: <span id="lines">0</span></div>
-            </div>
-        </div>
-        
-        <div class="instructions">
-            <strong>🎮 第一排：←移動 🔄旋轉 →移動 • 第二排：⏸️暫停 ↓快降</strong><br>
-            🧠 經常遊玩有助於保持大腦活力
         </div>
     </div>
     
@@ -289,7 +315,7 @@
         <h2>🎉 遊戲結束</h2>
         <p style="font-size: 18px;">最終分數: <span id="finalScore">0</span></p>
         <p style="font-size: 16px;">太棒了！繼續挑戰更高分數吧！</p>
-        <button class="restart-btn" onclick="restartGame()">重新開始</button>
+        <button class="restart-btn" onclick="restartGame()">🔄 重新開始</button>
     </div>
     
     <div class="paused-overlay" id="pausedOverlay">
@@ -307,10 +333,14 @@
         const finalScoreElement = document.getElementById('finalScore');
         const pausedOverlay = document.getElementById('pausedOverlay');
         
-        // 遊戲設定
+        // 遊戲設定 - 優化手機屏幕
         const BOARD_WIDTH = 10;
-        const BOARD_HEIGHT = 16; // 適應更小的畫布
-        const BLOCK_SIZE = 20;
+        const BOARD_HEIGHT = 16;
+        const BLOCK_SIZE = Math.min(canvas.width / BOARD_WIDTH, canvas.height / BOARD_HEIGHT);
+        
+        // 調整canvas實際渲染大小
+        canvas.width = BOARD_WIDTH * BLOCK_SIZE;
+        canvas.height = BOARD_HEIGHT * BLOCK_SIZE;
         
         // 遊戲狀態
         let board = [];
@@ -321,9 +351,11 @@
         let gameRunning = false;
         let paused = false;
         let dropTime = 0;
-        let dropInterval = 1200; // 稍微慢一點，適合長輩
+        let dropInterval = 1000;
+        let pieceBag = [];
+        let bagIndex = 0;
         
-        // 方塊形狀定義（使用更鮮明的顔色）
+        // 方塊形狀定義（更鮮明的顏色）
         const PIECES = [
             {
                 shape: [
@@ -389,11 +421,9 @@
         // 初始化方塊袋子（7-bag系統）
         function initializeBag() {
             pieceBag = [];
-            // 把每種方塊的索引放入袋子
             for (let i = 0; i < PIECES.length; i++) {
                 pieceBag.push(i);
             }
-            // 打亂袋子順序（Fisher-Yates洗牌算法）
             for (let i = pieceBag.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [pieceBag[i], pieceBag[j]] = [pieceBag[j], pieceBag[i]];
@@ -403,17 +433,15 @@
         
         // 從袋子中取出下一個方塊
         function getNextPieceFromBag() {
-            // 如果袋子空了，重新初始化
             if (bagIndex >= pieceBag.length) {
                 initializeBag();
             }
-            
             const pieceIndex = pieceBag[bagIndex];
             bagIndex++;
             return pieceIndex;
         }
         
-        // 創建新方塊（使用7-bag系統）
+        // 創建新方塊
         function createPiece() {
             const pieceIndex = getNextPieceFromBag();
             const piece = JSON.parse(JSON.stringify(PIECES[pieceIndex]));
@@ -422,28 +450,40 @@
             return piece;
         }
         
-        // 繪製方塊（加強邊框效果）
+        // 繪製方塊（3D效果）
         function drawBlock(x, y, color) {
             const pixelX = x * BLOCK_SIZE;
             const pixelY = y * BLOCK_SIZE;
             
             // 主色塊
             ctx.fillStyle = color;
-            ctx.fillRect(pixelX, pixelY, BLOCK_SIZE - 2, BLOCK_SIZE - 2);
+            ctx.fillRect(pixelX + 1, pixelY + 1, BLOCK_SIZE - 2, BLOCK_SIZE - 2);
             
             // 高光效果
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
-            ctx.fillRect(pixelX, pixelY, BLOCK_SIZE - 2, 8);
-            ctx.fillRect(pixelX, pixelY, 8, BLOCK_SIZE - 2);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+            ctx.fillRect(pixelX + 1, pixelY + 1, BLOCK_SIZE - 2, 6);
+            ctx.fillRect(pixelX + 1, pixelY + 1, 6, BLOCK_SIZE - 2);
+            
+            // 陰影效果
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+            ctx.fillRect(pixelX + BLOCK_SIZE - 6, pixelY + 1, 5, BLOCK_SIZE - 2);
+            ctx.fillRect(pixelX + 1, pixelY + BLOCK_SIZE - 6, BLOCK_SIZE - 2, 5);
+            
+            // 邊框
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(pixelX + 0.5, pixelY + 0.5, BLOCK_SIZE - 1, BLOCK_SIZE - 1);
         }
         
         // 繪製遊戲板
         function drawBoard() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // 清除畫布
+            ctx.fillStyle = '#111';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
             
-            // 繪製網格線（淡化）
+            // 繪製網格線
             ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
-            ctx.lineWidth = 1;
+            ctx.lineWidth = 0.5;
             for (let x = 0; x <= BOARD_WIDTH; x++) {
                 ctx.beginPath();
                 ctx.moveTo(x * BLOCK_SIZE, 0);
@@ -557,18 +597,11 @@
             
             if (linesCleared > 0) {
                 lines += linesCleared;
-                // 更友善的計分系統
-                let points = 0;
-                switch(linesCleared) {
-                    case 1: points = 100; break;
-                    case 2: points = 300; break;
-                    case 3: points = 500; break;
-                    case 4: points = 800; break;
-                }
+                let points = [0, 100, 300, 500, 800][linesCleared];
                 score += points * level;
                 
                 level = Math.floor(lines / 10) + 1;
-                dropInterval = Math.max(300, 1200 - (level - 1) * 80);
+                dropInterval = Math.max(300, 1000 - (level - 1) * 80);
                 
                 updateUI();
             }
@@ -591,12 +624,12 @@
         // 重新開始遊戲
         function restartGame() {
             initBoard();
-            initializeBag(); // 初始化方塊袋子
+            initializeBag();
             currentPiece = createPiece();
             score = 0;
             level = 1;
             lines = 0;
-            dropInterval = 1200;
+            dropInterval = 1000;
             gameRunning = true;
             paused = false;
             gameOverElement.style.display = 'none';
@@ -615,58 +648,79 @@
             return false;
         }
         
+        // 防止重複觸發
+        let lastTouchTime = 0;
+        function handleTouch(callback) {
+            const now = Date.now();
+            if (now - lastTouchTime > 100) {
+                lastTouchTime = now;
+                callback();
+            }
+        }
+        
         // 觸控按鈕事件
         document.getElementById('leftBtn').addEventListener('touchstart', (e) => {
             e.preventDefault();
-            if (gameRunning && !paused) {
-                movePiece(-1, 0);
-            }
+            handleTouch(() => {
+                if (gameRunning && !paused) {
+                    movePiece(-1, 0);
+                }
+            });
         });
         
         document.getElementById('rightBtn').addEventListener('touchstart', (e) => {
             e.preventDefault();
-            if (gameRunning && !paused) {
-                movePiece(1, 0);
-            }
+            handleTouch(() => {
+                if (gameRunning && !paused) {
+                    movePiece(1, 0);
+                }
+            });
         });
         
         document.getElementById('rotateBtn').addEventListener('touchstart', (e) => {
             e.preventDefault();
-            if (gameRunning && !paused) {
-                const rotated = rotatePiece(currentPiece);
-                if (!isColliding(currentPiece, 0, 0, rotated)) {
-                    currentPiece.shape = rotated;
+            handleTouch(() => {
+                if (gameRunning && !paused) {
+                    const rotated = rotatePiece(currentPiece);
+                    if (!isColliding(currentPiece, 0, 0, rotated)) {
+                        currentPiece.shape = rotated;
+                    }
                 }
-            }
+            });
         });
         
         document.getElementById('dropBtn').addEventListener('touchstart', (e) => {
             e.preventDefault();
-            if (gameRunning && !paused) {
-                while (movePiece(0, 1)) {
-                    score += 1;
+            handleTouch(() => {
+                if (gameRunning && !paused) {
+                    while (movePiece(0, 1)) {
+                        score += 1;
+                    }
+                    updateUI();
                 }
-                updateUI();
-            }
+            });
         });
         
         document.getElementById('pauseBtn').addEventListener('touchstart', (e) => {
             e.preventDefault();
-            if (gameRunning) {
-                paused = !paused;
-                document.getElementById('pauseBtn').textContent = paused ? '繼續' : '暫停';
-                pausedOverlay.style.display = paused ? 'block' : 'none';
-                if (!paused) gameLoop();
-            }
+            handleTouch(() => {
+                if (gameRunning) {
+                    paused = !paused;
+                    document.getElementById('pauseBtn').textContent = paused ? '▶️' : '⏸️';
+                    pausedOverlay.style.display = paused ? 'block' : 'none';
+                    if (!paused) gameLoop();
+                }
+            });
         });
         
-        // 鍵盤支持（保留電腦版支持）
+        // 鍵盤支持
         document.addEventListener('keydown', (e) => {
             if (!gameRunning) return;
             
             if (e.code === 'Space') {
+                e.preventDefault();
                 paused = !paused;
-                document.getElementById('pauseBtn').textContent = paused ? '繼續' : '暫停';
+                document.getElementById('pauseBtn').textContent = paused ? '▶️' : '⏸️';
                 pausedOverlay.style.display = paused ? 'block' : 'none';
                 if (!paused) gameLoop();
                 return;
@@ -676,17 +730,21 @@
             
             switch (e.code) {
                 case 'ArrowLeft':
+                    e.preventDefault();
                     movePiece(-1, 0);
                     break;
                 case 'ArrowRight':
+                    e.preventDefault();
                     movePiece(1, 0);
                     break;
                 case 'ArrowDown':
+                    e.preventDefault();
                     if (movePiece(0, 1)) {
                         score += 1;
                     }
                     break;
                 case 'ArrowUp':
+                    e.preventDefault();
                     const rotated = rotatePiece(currentPiece);
                     if (!isColliding(currentPiece, 0, 0, rotated)) {
                         currentPiece.shape = rotated;
@@ -712,10 +770,21 @@
             requestAnimationFrame(gameLoop);
         }
         
-        // 防止頁面滾動
+        // 防止頁面滾動和縮放
         document.addEventListener('touchmove', (e) => {
             e.preventDefault();
         }, { passive: false });
+        
+        document.addEventListener('gesturestart', (e) => {
+            e.preventDefault();
+        });
+        
+        // 處理屏幕旋轉
+        window.addEventListener('orientationchange', () => {
+            setTimeout(() => {
+                location.reload();
+            }, 100);
+        });
         
         // 啟動遊戲
         restartGame();
