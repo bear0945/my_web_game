@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>配對遊戲</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #E6D7FF;
+            min-height: 100vh;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        h1 {
+            color: #6B5B95;
+            font-size: 2rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(107, 91, 149, 0.2);
+        }
+
+        .controls {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .controls button {
+            background-color: #FFD6E8;
+            color: #6B5B95;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(107, 91, 149, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .controls button:hover {
+            transform: translateY(-2px);
+            background-color: #FFC4DD;
+        }
+
+        .controls button.active {
+            background-color: #FFC4DD;
+        }
+
+        .difficulty-controls {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .difficulty-controls button {
+            background-color: #FFD6E8;
+            color: #6B5B95;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(107, 91, 149, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .difficulty-controls button:hover {
+            transform: translateY(-2px);
+            background-color: #FFC4DD;
+        }
+
+        .difficulty-controls button.active {
+            background-color: #FFC4DD;
+        }
+
+        .game-info {
+            color: #6B5B95;
+            font-size: 16px;
+            margin-bottom: 15px;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .time-warning {
+            color: #FF6B6B !important;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(107, 91, 149, 0.2);
+        }
+
+        .win-message {
+            background-color: #FFF8DC;
+            color: #6B5B95;
+            animation: bounce 1s ease-in-out;
+        }
+
+        .lose-message {
+            background-color: #FFE4E1;
+            color: #B22222;
+        }
+
+        .game-board {
+            display: grid;
+            gap: 8px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background-color: #FFE5F1;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(107, 91, 149, 0.2);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            user-select: none;
+        }
+
+        .card:hover:not(.matched):not(.no-click) {
+            transform: scale(1.05);
+        }
+
+        .card.flipped {
+            background-color: #F0F8FF;
+            transform: scale(0.95);
+        }
+
+        .card.matched {
+            background-color: #FFF8DC;
+            transform: scale(0.95);
+            border-color: #FFF8DC;
+            cursor: default;
+        }
+
+        .nightmare-type-btn {
+            background-color: #E6D7FF;
+            color: #6B5B95;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(107, 91, 149, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .nightmare-type-btn:hover {
+            transform: translateY(-1px);
+            background-color: #D4C5F9;
+        }
+
+        .card.no-click {
+            cursor: default;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>配對遊戲</h1>
+
+        <div class="controls">
+            <button onclick="setGridSize(12)" id="grid-12">12格 (3×4)</button>
+            <button onclick="setGridSize(16)" id="grid-16">16格 (4×4)</button>
+            <button onclick="setGridSize(20)" id="grid-20">20格 (4×5)</button>
+            <button onclick="initializeGame()">重新開始</button>
+        </div>
+
+        <div class="difficulty-controls">
+            <button onclick="setDifficulty('normal')" id="diff-normal">普通</button>
+            <button onclick="setDifficulty('hard')" id="diff-hard">困難</button>
+            <button onclick="setDifficulty('expert')" id="diff-expert">專家</button>
+            <button onclick="setDifficulty('nightmare')" id="diff-nightmare">夢魘</button>
+        </div>
+
+        <div id="nightmare-types" style="display: none; margin-bottom: 20px;">
+            <div style="color: #6B5B95; font-size: 14px; font-weight: bold; margin-bottom: 10px;">夢魘模式類型：</div>
+            <div style="display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;">
+                <button onclick="setNightmareType('similar')" id="type-similar" class="nightmare-type-btn">相似符號</button>
+                <button onclick="setNightmareType('animals')" id="type-animals" class="nightmare-type-btn">動物臉</button>
+                <button onclick="setNightmareType('fruits')" id="type-fruits" class="nightmare-type-btn">水果</button>
+                <button onclick="setNightmareType('sweets')" id="type-sweets" class="nightmare-type-btn">甜點</button>
+            </div>
+        </div>
+
+        <div class="game-info">
+            <div>步數: <span id="moves">0</span></div>
+            <div>配對: <span id="pairs">0</span>/<span id="total-pairs">0</span></div>
+            <div id="timer" style="display: none;">時間: <span id="time">0:00</span></div>
+            <div id="final-time" style="display: none;">完成時間: <span id="final-seconds">0</span>秒</div>
+        </div>
+
+        <div id="message" style="display: none;"></div>
+
+        <div class="game-board" id="game-board"></div>
+    </div>
+
+    <script>
+        var gridSize = 12;
+        var cards = [];
+        var flippedCards = [];
+        var matchedPairs = [];
+        var moves = 0;
+        var gameWon = false;
+        var difficulty = 'normal';
+        var timeLeft = null;
+        var gameStartTime = null;
+        var finalTime = null;
+        var timer = null;
+
+        var emojis = ['🌸', '🦄', '🌙', '⭐', '🍓', '🌈', '🦋', '🌺', '🍒', '🎀', '💎', '🧸', '🍰', '🌻', '🐱', '🎈', '🍭', '🎪', '🎯', '🎨', '🎵', '⚡', '🔮', '🍄', '🎭', '🌊'];
+
+        var nightmareEmojis = {
+            similar: ['🌸', '🌺', '😀', '😃', '⭐', '✨', '🌙', '🌛', '❤️', '💕', '🔵', '🔴', '🎈', '🎁', '🍎', '🍒', '🦋', '🐛', '👁️', '👀', '💫', '⚡', '🌻', '🌼', '🎯', '⚽'],
+            animals: ['🐶', '🐱', '🐭', '🐹', '🦊', '🐻', '🐼', '🐷', '🐺', '🦝'],
+            fruits: ['🍏', '🍎', '🍐', '🍊', '🍋', '🍓', '🍍', '🍇', '🍑', '🥭'],
+            sweets: ['🍩', '🍬', '🍭', '🍮', '🧁', '🍦', '🍨', '🍫', '🍪', '🎂']
+        };
+
+        var nightmareType = 'similar';
+
+        var difficultySettings = {
+            normal: { flipTime: 1000, timeLimit: null, previewTime: 2000 },
+            hard: { flipTime: 800, timeLimit: 120, previewTime: 1500 },
+            expert: { flipTime: 600, timeLimit: 90, previewTime: 1000 },
+            nightmare: { flipTime: 500, timeLimit: 60, previewTime: 500 }
+        };
+
+        function setGridSize(size) {
+            gridSize = size;
+            var buttons = document.querySelectorAll('.controls button');
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].classList.remove('active');
+            }
+            document.getElementById('grid-' + size).classList.add('active');
+            initializeGame();
+        }
+
+        function setDifficulty(diff) {
+            difficulty = diff;
+            var buttons = document.querySelectorAll('.difficulty-controls button');
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].classList.remove('active');
+            }
+            document.getElementById('diff-' + diff).classList.add('active');
+            
+            // 顯示或隱藏夢魘模式類型選擇
+            var nightmareTypesDiv = document.getElementById('nightmare-types');
+            if (diff === 'nightmare') {
+                nightmareTypesDiv.style.display = 'block';
+            } else {
+                nightmareTypesDiv.style.display = 'none';
+            }
+            
+            initializeGame();
+        }
+
+        function setNightmareType(type) {
+            nightmareType = type;
+            var buttons = document.querySelectorAll('.nightmare-type-btn');
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].classList.remove('active');
+            }
+            document.getElementById('type-' + type).classList.add('active');
+            initializeGame();
+        }
+
+        function initializeGame() {
+            var numPairs = gridSize / 2;
+            var emojiSet;
+            if (difficulty === 'nightmare') {
+                emojiSet = nightmareEmojis[nightmareType];
+            } else {
+                emojiSet = emojis;
+            }
+            var selectedEmojis = emojiSet.slice(0, numPairs);
+            var allEmojis = selectedEmojis.concat(selectedEmojis);
+            
+            var gameCards = [];
+            for (var i = 0; i < allEmojis.length; i++) {
+                gameCards.push({
+                    id: i,
+                    emoji: allEmojis[i],
+                    isFlipped: false,
+                    isMatched: false
+                });
+            }
+            
+            for (var j = gameCards.length - 1; j > 0; j--) {
+                var k = Math.floor(Math.random() * (j + 1));
+                var temp = gameCards[j];
+                gameCards[j] = gameCards[k];
+                gameCards[k] = temp;
+            }
+
+            cards = gameCards;
+            flippedCards = [];
+            matchedPairs = [];
+            moves = 0;
+            gameWon = false;
+            gameStartTime = Date.now();
+            finalTime = null;
+
+            if (timer) {
+                clearInterval(timer);
+            }
+            
+            var settings = difficultySettings[difficulty];
+            if (settings.timeLimit) {
+                timeLeft = settings.timeLimit;
+                document.getElementById('timer').style.display = 'block';
+                startTimer();
+            } else {
+                timeLeft = null;
+                document.getElementById('timer').style.display = 'none';
+            }
+
+            document.getElementById('message').style.display = 'none';
+            document.getElementById('final-time').style.display = 'none';
+
+            updateDisplay();
+            setupGameBoard();
+
+            for (var m = 0; m < cards.length; m++) {
+                cards[m].isFlipped = true;
+            }
+            renderCards();
+
+            setTimeout(function() {
+                for (var n = 0; n < cards.length; n++) {
+                    cards[n].isFlipped = false;
+                }
+                renderCards();
+            }, settings.previewTime);
+        }
+
+        function startTimer() {
+            timer = setInterval(function() {
+                if (timeLeft > 0 && !gameWon) {
+                    timeLeft--;
+                    updateTimerDisplay();
+                    if (timeLeft <= 10) {
+                        document.getElementById('time').parentElement.classList.add('time-warning');
+                    }
+                } else if (timeLeft === 0 && !gameWon) {
+                    clearInterval(timer);
+                    showMessage('⏰ 時間到了！再試一次吧！', 'lose-message');
+                    disableAllCards();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            var minutes = Math.floor(timeLeft / 60);
+            var seconds = timeLeft % 60;
+            var secondsStr = seconds < 10 ? '0' + seconds : seconds.toString();
+            document.getElementById('time').textContent = minutes + ':' + secondsStr;
+        }
+
+        function setupGameBoard() {
+            var gameBoard = document.getElementById('game-board');
+            var columns = getGridColumns(gridSize);
+            var cardSize = gridSize === 20 ? '70px' : '80px';
+            var fontSize = gridSize === 20 ? '28px' : '32px';
+            var maxWidth = gridSize === 12 ? '300px' : '360px';
+
+            gameBoard.style.gridTemplateColumns = 'repeat(' + columns + ', 1fr)';
+            gameBoard.style.maxWidth = maxWidth;
+            gameBoard.innerHTML = '';
+
+            for (var i = 0; i < cards.length; i++) {
+                var card = cards[i];
+                var cardElement = document.createElement('div');
+                cardElement.className = 'card';
+                cardElement.style.width = cardSize;
+                cardElement.style.height = cardSize;
+                cardElement.style.fontSize = fontSize;
+                cardElement.setAttribute('data-id', card.id);
+                cardElement.textContent = '❓';
+                
+                (function(currentCard) {
+                    cardElement.onclick = function() {
+                        handleCardClick(currentCard);
+                    };
+                })(card);
+                
+                gameBoard.appendChild(cardElement);
+            }
+        }
+
+        function getGridColumns(size) {
+            if (size === 12) return 3;
+            if (size === 16) return 4;
+            if (size === 20) return 4;
+            return 4;
+        }
+
+        function handleCardClick(clickedCard) {
+            if (clickedCard.isFlipped || clickedCard.isMatched || flippedCards.length === 2 || gameWon || timeLeft === 0) {
+                return;
+            }
+
+            flippedCards.push(clickedCard);
+            clickedCard.isFlipped = true;
+            renderCards();
+
+            if (flippedCards.length === 2) {
+                moves++;
+                updateDisplay();
+
+                if (flippedCards[0].emoji === flippedCards[1].emoji) {
+                    setTimeout(function() {
+                        flippedCards[0].isMatched = true;
+                        flippedCards[1].isMatched = true;
+                        matchedPairs.push(flippedCards[0].emoji);
+                        flippedCards = [];
+                        renderCards();
+                        updateDisplay();
+                        checkWin();
+                    }, 500);
+                } else {
+                    var flipTime = difficultySettings[difficulty].flipTime;
+                    setTimeout(function() {
+                        flippedCards[0].isFlipped = false;
+                        flippedCards[1].isFlipped = false;
+                        flippedCards = [];
+                        renderCards();
+                    }, flipTime);
+                }
+            }
+        }
+
+        function renderCards() {
+            for (var i = 0; i < cards.length; i++) {
+                var card = cards[i];
+                var cardElement = document.querySelector('[data-id="' + card.id + '"]');
+                if (cardElement) {
+                    cardElement.className = 'card';
+                    if (card.isMatched) {
+                        cardElement.classList.add('matched');
+                    } else if (card.isFlipped) {
+                        cardElement.classList.add('flipped');
+                    }
+                    
+                    if (timeLeft === 0 && !gameWon) {
+                        cardElement.classList.add('no-click');
+                    }
+
+                    cardElement.textContent = (card.isFlipped || card.isMatched) ? card.emoji : '❓';
+                }
+            }
+        }
+
+        function updateDisplay() {
+            document.getElementById('moves').textContent = moves;
+            document.getElementById('pairs').textContent = matchedPairs.length;
+            document.getElementById('total-pairs').textContent = gridSize / 2;
+        }
+
+        function checkWin() {
+            if (matchedPairs.length === gridSize / 2) {
+                gameWon = true;
+                if (timer) {
+                    clearInterval(timer);
+                }
+                if (gameStartTime) {
+                    finalTime = Math.floor((Date.now() - gameStartTime) / 1000);
+                    document.getElementById('final-seconds').textContent = finalTime;
+                    document.getElementById('final-time').style.display = 'block';
+                }
+
+                var diffNames = {
+                    normal: '普通',
+                    hard: '困難',
+                    expert: '專家',
+                    nightmare: '夢魘'
+                };
+                
+                var message = '🎉 恭喜！您用 ' + moves + ' 步' + (finalTime ? '，' + finalTime + '秒' : '') + '完成了' + diffNames[difficulty] + '模式！ 🎉';
+                showMessage(message, 'win-message');
+            }
+        }
+
+        function showMessage(text, className) {
+            var messageElement = document.getElementById('message');
+            messageElement.textContent = text;
+            messageElement.className = 'message ' + className;
+            messageElement.style.display = 'block';
+        }
+
+        function disableAllCards() {
+            var allCards = document.querySelectorAll('.card');
+            for (var i = 0; i < allCards.length; i++) {
+                allCards[i].classList.add('no-click');
+            }
+        }
+
+        window.onload = function() {
+            document.getElementById('grid-12').classList.add('active');
+            document.getElementById('diff-normal').classList.add('active');
+            document.getElementById('type-similar').classList.add('active');
+            initializeGame();
+        };
+    </script>
+</body>
+</html>
