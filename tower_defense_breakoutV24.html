@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>塔防式打磚塊</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #FAF6F0, #E5E1E1);
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            transition: background 0.5s ease;
+        }
+        
+        body.night-theme {
+            background: linear-gradient(135deg, #3B1C4A, #1E2A5A);
+        }
+        
+        body.night-theme #gameCanvas {
+            background: linear-gradient(180deg, #4A2C5A 0%, #2A3E6A 100%);
+        }
+        
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        .game-info {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .level { color: #D1B3F9; }
+        .score { color: #AEE7E3; }
+        .lives { color: #F8A1A1; }
+        .next-drop { color: #F9C4A0; }
+        
+        #gameCanvas {
+            flex: 1;
+            display: block;
+            background: linear-gradient(180deg, #F6F2B7 0%, #CFF6C8 100%);
+            margin: 0 10px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .game-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.9);
+        }
+        
+        .game-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.9);
+        }
+        
+        .left-controls, .right-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .center-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .control-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #B5CFFA;
+            border: none;
+            font-size: 24px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        
+        .control-btn:active {
+            background: #A6D9F5;
+            transform: scale(0.95);
+        }
+        
+        .pause-btn {
+            background: #F9C4A0;
+            font-size: 16px;
+        }
+        
+        .theme-btn {
+            background: #FAD6A5;
+            font-size: 20px;
+        }
+        
+        .power-ups {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .bomb-button {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #F8A1A1;
+            border: none;
+            font-size: 24px;
+            color: white;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s;
+        }
+        
+        .bomb-button:disabled {
+            background: #E5E1E1;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+        
+        .bomb-button.active {
+            background: #F1C0E8;
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .bomb-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #D1B3F9;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .current-buffs {
+            display: flex;
+            gap: 5px;
+            font-size: 20px;
+        }
+        
+        .game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            display: none;
+        }
+        
+        .restart-btn {
+            background: #B5CFFA;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-header">
+        <div class="game-info">
+            <div class="level">等級: <span id="level">1</span></div>
+            <div class="score">分數: <span id="score">0</span></div>
+            <div class="lives">生命: <span id="lives">3</span></div>
+        </div>
+        <div class="next-drop">下次下降: <span id="nextDrop">90</span>s</div>
+    </div>
+    
+    <canvas id="gameCanvas"></canvas>
+    
+    <div class="game-controls">
+        <div class="left-controls">
+            <button class="control-btn" id="leftBtn">◀</button>
+        </div>
+        
+        <div class="center-controls">
+            <button class="control-btn pause-btn" id="pauseBtn">⏸️</button>
+            <button class="control-btn theme-btn" id="themeBtn">☀️</button>
+            <div class="current-buffs" id="currentBuffs"></div>
+        </div>
+        
+        <div class="right-controls">
+            <button class="bomb-button" id="bombButton" disabled>💣
+                <div class="bomb-count" id="bombCount">0</div>
+            </button>
+            <button class="control-btn" id="rightBtn">▶</button>
+        </div>
+    </div>
+    
+    <div class="game-over" id="gameOver">
+        <h2>遊戲結束</h2>
+        <p>最終分數: <span id="finalScore">0</span></p>
+        <p>達到等級: <span id="finalLevel">1</span></p>
+        <button class="restart-btn" onclick="startGame()">重新開始</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // 遊戲色彩
+        const colors = [
+            '#F8A1A1', '#F9B2A6', '#F9C4A0', '#FAD6A5', '#FAE8A4',
+            '#F6F2B7', '#CFF6C8', '#B8E9C0', '#AEE7E3', '#A6D9F5',
+            '#B5CFFA', '#C6BDF7', '#D1B3F9', '#E0BBF5', '#F1C0E8',
+            '#FDE2E4', '#FAF6F0', '#E5E1E1'
+        ];
+        
+        // 遊戲狀態
+        let gameState = {
+            level: 1,
+            score: 0,
+            lives: 3,
+            nextDropTime: 90,
+            dropTimer: 0,
+            bombCount: 0,
+            isGameOver: false,
+            isPaused: false,
+            isNightTheme: false,
+            buffs: {}
+        };
+        
+        // 遊戲物件
+        let paddle = {};
+        let balls = [];
+        let bricks = [];
+        let powerUps = [];
+        
+        // 控制
+        let leftPressed = false;
+        let rightPressed = false;
+        
+        function resizeCanvas() {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            
+            // 如果遊戲已經開始，只調整現有物件位置，不重新初始化
+            if (paddle.x !== undefined) {
+                // 調整球拍位置，確保不超出邊界
+                paddle.x = Math.min(paddle.x, canvas.width - paddle.width);
+                paddle.y = canvas.height - 60;
+                
+                // 調整球的位置，確保不超出邊界
+                balls.forEach(ball => {
+                    ball.x = Math.min(ball.x, canvas.width - ball.radius);
+                    ball.x = Math.max(ball.x, ball.radius);
+                });
+                
+                // 調整磚塊位置（按比例縮放）
+                const newCols = Math.floor(canvas.width / 50);
+                const newBrickWidth = canvas.width / newCols;
+                
+                for (let row = 0; row < bricks.length; row++) {
+                    if (bricks[row]) {
+                        for (let col = 0; col < bricks[row].length; col++) {
+                            if (bricks[row][col]) {
+                                // 重新計算磚塊位置
+                                bricks[row][col].x = col * newBrickWidth;
+                                bricks[row][col].width = newBrickWidth - 2;
+                            }
+                        }
+                    }
+                }
+                
+                // 調整道具位置
+                powerUps.forEach(powerUp => {
+                    powerUp.x = Math.min(powerUp.x, canvas.width - 20);
+                    powerUp.x = Math.max(powerUp.x, 20);
+                });
+            } else {
+                // 如果遊戲還沒開始，才進行初始化
+                initGame();
+            }
+        }
+        
+        function initGame() {
+            // 初始化球拍
+            paddle = {
+                x: canvas.width / 2 - 40,
+                y: canvas.height - 60,
+                width: 80,
+                height: 15,
+                speed: 5,
+                originalWidth: 80,
+                originalSpeed: 5
+            };
+            
+            // 初始化球
+            balls = [{
+                x: canvas.width / 2,
+                y: canvas.height - 100,
+                dx: 3,
+                dy: -3,
+                radius: 8,
+                hasBomb: false,
+                isPenetrating: false
+            }];
+            
+            // 初始化磚塊
+            bricks = [];
+            generateInitialBricks();
+        }
+        
+        function generateInitialBricks() {
+            const rows = 8;
+            const cols = Math.floor(canvas.width / 50);
+            const brickWidth = canvas.width / cols;
+            const brickHeight = 25;
+            
+            for (let row = 0; row < rows; row++) {
+                bricks[row] = [];
+                for (let col = 0; col < cols; col++) {
+                    if (Math.random() > 0.3) { // 70% 機率生成磚塊
+                        bricks[row][col] = {
+                            x: col * brickWidth,
+                            y: row * brickHeight + 50,
+                            width: brickWidth - 2,
+                            height: brickHeight - 2,
+                            health: 1,
+                            color: colors[Math.floor(Math.random() * colors.length)]
+                        };
+                    }
+                }
+            }
+        }
+        
+        function dropNewRow() {
+            // 向下移動所有磚塊
+            for (let row = bricks.length - 1; row >= 0; row--) {
+                if (bricks[row]) {
+                    for (let col = 0; col < bricks[row].length; col++) {
+                        if (bricks[row][col]) {
+                            bricks[row][col].y += 27;
+                            // 檢查是否到達橫桿高度
+                            if (bricks[row][col].y >= paddle.y - 30) {
+                                gameOver();
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // 生成新的一排
+            const cols = Math.floor(canvas.width / 50);
+            const brickWidth = canvas.width / cols;
+            const newRow = [];
+            
+            // 隨機生成半排到整排
+            const fillRatio = 0.3 + Math.random() * 0.7;
+            for (let col = 0; col < cols; col++) {
+                if (Math.random() < fillRatio) {
+                    newRow[col] = {
+                        x: col * brickWidth,
+                        y: 50,
+                        width: brickWidth - 2,
+                        height: 23,
+                        health: 1,
+                        color: colors[Math.floor(Math.random() * colors.length)]
+                    };
+                }
+            }
+            
+            bricks.unshift(newRow);
+            
+            // 重置計時器
+            gameState.dropTimer = 0;
+            updateDropTime();
+        }
+        
+        function updateDropTime() {
+            // 根據等級調整下降時間，從40秒開始
+            if (gameState.level <= 3) {
+                gameState.nextDropTime = 40 - (gameState.level - 1) * 3; // 40s -> 37s -> 34s
+            } else if (gameState.level <= 6) {
+                gameState.nextDropTime = 31 - (gameState.level - 4) * 3; // 31s -> 28s -> 25s
+            } else if (gameState.level <= 10) {
+                gameState.nextDropTime = 22 - (gameState.level - 7) * 2; // 22s -> 20s -> 18s -> 16s
+            } else if (gameState.level <= 15) {
+                gameState.nextDropTime = 16 - Math.floor((gameState.level - 11) * 0.2); // 16s -> 15.8s -> 15.6s...
+            } else {
+                gameState.nextDropTime = 15; // 最終15秒
+            }
+        }
+        
+        function generatePowerUp(x, y) {
+            if (Math.random() < 0.15) { // 15% 機率掉道具
+                const powerUpTypes = [
+                    { type: 'extend', emoji: '↔️', probability: 0.25 }, // 提高到25%
+                    { type: 'speed', emoji: '⚡', probability: 0.15 },
+                    { type: 'slow', emoji: '❄️', probability: 0.10 },
+                    { type: 'shrink', emoji: '➖', probability: 0.08 }, // 降低負面道具
+                    { type: 'multiball', emoji: '🍇', probability: 0.08 },
+                    { type: 'penetrate', emoji: '🔥', probability: 0.07 },
+                    { type: 'life', emoji: '⭐', probability: 0.05 },
+                    { type: 'bomb', emoji: '💣', probability: 0.05 },
+                    { type: 'timefreeze', emoji: '⏰', probability: 0.03 },
+                    { type: 'clearbottom', emoji: '🧹', probability: 0.02 }
+                ];
+                
+                let rand = Math.random();
+                let cumulative = 0;
+                
+                for (let powerUp of powerUpTypes) {
+                    cumulative += powerUp.probability;
+                    if (rand <= cumulative) {
+                        powerUps.push({
+                            x: x,
+                            y: y,
+                            type: powerUp.type,
+                            emoji: powerUp.emoji,
+                            dy: 2
+                        });
+                        break;
+                    }
+                }
+            }
+        }
+        
+        function activatePowerUp(type) {
+            switch (type) {
+                case 'extend':
+                    // 先清除縮短效果
+                    delete gameState.buffs.shrink;
+                    paddle.width = Math.min(paddle.originalWidth * 1.8, canvas.width * 0.25);
+                    gameState.buffs.extend = { time: 1200, emoji: '↔️' };
+                    break;
+                case 'shrink':
+                    // 先清除加長效果
+                    delete gameState.buffs.extend;
+                    paddle.width = Math.max(paddle.originalWidth * 0.6, canvas.width * 0.04);
+                    gameState.buffs.shrink = { time: 1200, emoji: '➖' };
+                    break;
+                case 'speed':
+                    delete gameState.buffs.slow;
+                    balls.forEach(ball => {
+                        ball.dx *= 1.5;
+                        ball.dy *= 1.5;
+                    });
+                    // 橫桿也加速
+                    paddle.speed *= 1.5;
+                    gameState.buffs.speed = { time: 900, emoji: '⚡' };
+                    break;
+                case 'slow':
+                    delete gameState.buffs.speed;
+                    balls.forEach(ball => {
+                        ball.dx *= 0.7;
+                        ball.dy *= 0.7;
+                    });
+                    // 橫桿也減速
+                    paddle.speed *= 0.7;
+                    gameState.buffs.slow = { time: 900, emoji: '❄️' };
+                    break;
+                case 'multiball':
+                    if (balls.length < 3) {
+                        const originalBall = balls[0];
+                        balls.push({
+                            x: originalBall.x + 20,
+                            y: originalBall.y,
+                            dx: originalBall.dx + 1,
+                            dy: originalBall.dy,
+                            radius: originalBall.radius,
+                            hasBomb: false,
+                            isPenetrating: gameState.buffs.penetrate ? true : false
+                        });
+                    }
+                    break;
+                case 'penetrate':
+                    balls.forEach(ball => ball.isPenetrating = true);
+                    gameState.buffs.penetrate = { time: 600, emoji: '🔥' };
+                    break;
+                case 'bomb':
+                    gameState.bombCount = Math.min(gameState.bombCount + 1, 3);
+                    updateBombButton();
+                    break;
+                case 'life':
+                    gameState.lives = Math.min(gameState.lives + 1, 5);
+                    break;
+                case 'timefreeze':
+                    gameState.buffs.timefreeze = { time: 300, emoji: '⏰' };
+                    break;
+                case 'clearbottom':
+                    // 清除最底層磚塊
+                    for (let row = bricks.length - 1; row >= 0; row--) {
+                        if (bricks[row] && bricks[row].some(brick => brick)) {
+                            bricks[row] = bricks[row].map(() => null);
+                            break;
+                        }
+                    }
+                    break;
+            }
+            updateBuffDisplay();
+        }
+        
+        function updateBuffDisplay() {
+            const buffsDiv = document.getElementById('currentBuffs');
+            buffsDiv.innerHTML = '';
+            for (let [key, buff] of Object.entries(gameState.buffs)) {
+                if (buff.time > 0) {
+                    buffsDiv.innerHTML += buff.emoji;
+                }
+            }
+        }
+        
+        function updateBombButton() {
+            const bombButton = document.getElementById('bombButton');
+            const bombCount = document.getElementById('bombCount');
+            
+            bombButton.disabled = gameState.bombCount === 0;
+            bombButton.className = gameState.bombCount > 0 ? 'bomb-button active' : 'bomb-button';
+            bombCount.textContent = gameState.bombCount;
+            bombCount.style.display = gameState.bombCount > 0 ? 'flex' : 'none';
+        }
+        
+        function useBomb() {
+            if (gameState.bombCount > 0 && balls.length > 0) {
+                balls[0].hasBomb = true;
+                gameState.bombCount--;
+                updateBombButton();
+            }
+        }
+        
+        function explodeBomb(ball, hitBrickRow, hitBrickCol) {
+            // 3x3 爆炸範圍
+            for (let r = hitBrickRow - 1; r <= hitBrickRow + 1; r++) {
+                for (let c = hitBrickCol - 1; c <= hitBrickCol + 1; c++) {
+                    if (r >= 0 && r < bricks.length && c >= 0 && c < bricks[r].length) {
+                        if (bricks[r][c]) {
+                            bricks[r][c] = null;
+                            gameState.score += 10;
+                        }
+                    }
+                }
+            }
+            ball.hasBomb = false;
+        }
+        
+        function updateGame() {
+            if (gameState.isGameOver || gameState.isPaused) return;
+            
+            // 更新 buff 時間
+            for (let [key, buff] of Object.entries(gameState.buffs)) {
+                buff.time--;
+                if (buff.time <= 0) {
+                    delete gameState.buffs[key];
+                    // 恢復原始狀態
+                    if (key === 'extend' || key === 'shrink') {
+                        paddle.width = paddle.originalWidth;
+                    } else if (key === 'penetrate') {
+                        // 移除所有球的穿透效果
+                        balls.forEach(ball => ball.isPenetrating = false);
+                    } else if (key === 'speed' || key === 'slow') {
+                        // 恢復橫桿原始速度
+                        paddle.speed = paddle.originalSpeed;
+                    }
+                }
+            }
+            
+            // 更新下降計時器
+            if (!gameState.buffs.timefreeze) {
+                gameState.dropTimer++;
+                if (gameState.dropTimer >= gameState.nextDropTime * 60) { // 60 FPS
+                    dropNewRow();
+                }
+            }
+            
+            // 更新球拍位置
+            if (leftPressed && !rightPressed) {
+                paddle.x -= paddle.speed;
+            } else if (rightPressed && !leftPressed) {
+                paddle.x += paddle.speed;
+            }
+            paddle.x = Math.max(0, Math.min(canvas.width - paddle.width, paddle.x));
+            
+            // 更新球
+            balls.forEach((ball, ballIndex) => {
+                ball.x += ball.dx;
+                ball.y += ball.dy;
+                
+                // 邊界碰撞
+                if (ball.x <= ball.radius || ball.x >= canvas.width - ball.radius) {
+                    ball.dx = -ball.dx;
+                }
+                if (ball.y <= ball.radius) {
+                    ball.dy = -ball.dy;
+                }
+                
+                // 球掉出畫面
+                if (ball.y > canvas.height) {
+                    balls.splice(ballIndex, 1);
+                    if (balls.length === 0) {
+                        gameState.lives--;
+                        if (gameState.lives <= 0) {
+                            gameOver();
+                            return;
+                        } else {
+                            // 重新發球
+                            balls.push({
+                                x: canvas.width / 2,
+                                y: canvas.height - 100,
+                                dx: 3,
+                                dy: -3,
+                                radius: 8,
+                                hasBomb: false,
+                                isPenetrating: false
+                            });
+                        }
+                    }
+                }
+                
+                // 球拍碰撞 - 修正碰撞判定
+                if (ball.dy > 0 && // 球必須向下移動
+                    ball.y + ball.radius >= paddle.y && 
+                    ball.y + ball.radius <= paddle.y + paddle.height + 5 && // 給一點容錯空間
+                    ball.x >= paddle.x - ball.radius && 
+                    ball.x <= paddle.x + paddle.width + ball.radius) {
+                    
+                    ball.dy = -Math.abs(ball.dy); // 確保向上反彈
+                    // 根據擊中位置調整角度
+                    let hitPos = (ball.x - paddle.x) / paddle.width;
+                    hitPos = Math.max(0, Math.min(1, hitPos)); // 限制範圍
+                    ball.dx = (hitPos - 0.5) * 6;
+                }
+                
+                // 磚塊碰撞
+                for (let row = 0; row < bricks.length; row++) {
+                    if (!bricks[row]) continue;
+                    for (let col = 0; col < bricks[row].length; col++) {
+                        let brick = bricks[row][col];
+                        if (!brick) continue;
+                        
+                        if (ball.x >= brick.x && ball.x <= brick.x + brick.width &&
+                            ball.y >= brick.y && ball.y <= brick.y + brick.height) {
+                            
+                            if (ball.hasBomb) {
+                                explodeBomb(ball, row, col);
+                            } else {
+                                bricks[row][col] = null;
+                                gameState.score += 10;
+                                generatePowerUp(brick.x + brick.width/2, brick.y + brick.height);
+                            }
+                            
+                            if (!ball.isPenetrating) {
+                                ball.dy = -ball.dy;
+                            }
+                            break;
+                        }
+                    }
+                }
+            });
+            
+            // 更新道具
+            powerUps.forEach((powerUp, index) => {
+                powerUp.y += powerUp.dy;
+                
+                // 道具與球拍碰撞
+                if (powerUp.y + 20 >= paddle.y && 
+                    powerUp.x >= paddle.x - 20 && powerUp.x <= paddle.x + paddle.width + 20) {
+                    activatePowerUp(powerUp.type);
+                    powerUps.splice(index, 1);
+                }
+                
+                // 道具掉出畫面
+                if (powerUp.y > canvas.height) {
+                    powerUps.splice(index, 1);
+                }
+            });
+            
+            // 更新等級 - 修正等級跳躍問題
+            let totalBricks = 0;
+            for (let row of bricks) {
+                if (row) {
+                    totalBricks += row.filter(brick => brick).length;
+                }
+            }
+            
+            // 每清理一定數量的磚塊升級，而不是根據剩餘磚塊
+            const targetScore = gameState.level * 500; // 每500分升一級
+            if (gameState.score >= targetScore && gameState.level < 20) {
+                gameState.level++;
+                updateDropTime();
+            }
+            
+            updateUI();
+        }
+        
+        function updateUI() {
+            document.getElementById('level').textContent = gameState.level;
+            document.getElementById('score').textContent = gameState.score;
+            document.getElementById('lives').textContent = gameState.lives;
+            
+            const timeLeft = Math.max(0, Math.ceil((gameState.nextDropTime * 60 - gameState.dropTimer) / 60));
+            document.getElementById('nextDrop').textContent = timeLeft;
+            
+            updateBuffDisplay();
+        }
+        
+        function drawGame() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // 繪製磚塊
+            for (let row of bricks) {
+                if (!row) continue;
+                for (let brick of row) {
+                    if (!brick) continue;
+                    
+                    ctx.fillStyle = brick.color;
+                    ctx.fillRect(brick.x, brick.y, brick.width, brick.height);
+                    ctx.strokeStyle = '#fff';
+                    ctx.lineWidth = 1;
+                    ctx.strokeRect(brick.x, brick.y, brick.width, brick.height);
+                }
+            }
+            
+            // 繪製球拍
+            ctx.fillStyle = '#B5CFFA';
+            ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
+            
+            // 繪製球
+            balls.forEach(ball => {
+                ctx.beginPath();
+                ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+                
+                if (ball.hasBomb) {
+                    ctx.fillStyle = '#F8A1A1';
+                } else if (ball.isPenetrating) {
+                    ctx.fillStyle = '#F9C4A0';
+                } else {
+                    ctx.fillStyle = '#D1B3F9';
+                }
+                
+                ctx.fill();
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            });
+            
+            // 繪製道具
+            powerUps.forEach(powerUp => {
+                ctx.font = '20px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(powerUp.emoji, powerUp.x, powerUp.y);
+            });
+        }
+        
+        function gameLoop() {
+            updateGame();
+            drawGame();
+            requestAnimationFrame(gameLoop);
+        }
+        
+        function gameOver() {
+            gameState.isGameOver = true;
+            document.getElementById('finalScore').textContent = gameState.score;
+            document.getElementById('finalLevel').textContent = gameState.level;
+            document.getElementById('gameOver').style.display = 'block';
+        }
+        
+        function startGame() {
+            gameState = {
+                level: 1,
+                score: 0,
+                lives: 3,
+                nextDropTime: 40,
+                dropTimer: 0,
+                bombCount: 0,
+                isGameOver: false,
+                isPaused: false,
+                isNightTheme: false,
+                buffs: {}
+            };
+            
+            document.getElementById('gameOver').style.display = 'none';
+            document.getElementById('pauseBtn').textContent = '⏸️';
+            document.getElementById('themeBtn').textContent = '☀️';
+            document.body.className = '';
+            initGame();
+            updateBombButton();
+        }
+        
+        function togglePause() {
+            gameState.isPaused = !gameState.isPaused;
+            const pauseBtn = document.getElementById('pauseBtn');
+            pauseBtn.textContent = gameState.isPaused ? '▶️' : '⏸️';
+        }
+        
+        function toggleTheme() {
+            gameState.isNightTheme = !gameState.isNightTheme;
+            const themeBtn = document.getElementById('themeBtn');
+            
+            if (gameState.isNightTheme) {
+                document.body.classList.add('night-theme');
+                themeBtn.textContent = '🌙';
+            } else {
+                document.body.classList.remove('night-theme');
+                themeBtn.textContent = '☀️';
+            }
+        }
+        
+        // 控制按鈕事件
+        const leftBtn = document.getElementById('leftBtn');
+        const rightBtn = document.getElementById('rightBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const themeBtn = document.getElementById('themeBtn');
+        
+        // 鍵盤控制
+        document.addEventListener('keydown', (e) => {
+            switch(e.key) {
+                case 'ArrowLeft':
+                case 'a':
+                case 'A':
+                    leftPressed = true;
+                    e.preventDefault();
+                    break;
+                case 'ArrowRight':
+                case 'd':
+                case 'D':
+                    rightPressed = true;
+                    e.preventDefault();
+                    break;
+                case ' ':
+                    togglePause();
+                    e.preventDefault();
+                    break;
+                case 't':
+                case 'T':
+                    toggleTheme();
+                    e.preventDefault();
+                    break;
+            }
+        });
+        
+        document.addEventListener('keyup', (e) => {
+            switch(e.key) {
+                case 'ArrowLeft':
+                case 'a':
+                case 'A':
+                    leftPressed = false;
+                    break;
+                case 'ArrowRight':
+                case 'd':
+                case 'D':
+                    rightPressed = false;
+                    break;
+            }
+        });
+        
+        // 觸控和滑鼠事件
+        leftBtn.addEventListener('touchstart', () => leftPressed = true);
+        leftBtn.addEventListener('touchend', () => leftPressed = false);
+        leftBtn.addEventListener('mousedown', () => leftPressed = true);
+        leftBtn.addEventListener('mouseup', () => leftPressed = false);
+        leftBtn.addEventListener('mouseleave', () => leftPressed = false);
+        
+        rightBtn.addEventListener('touchstart', () => rightPressed = true);
+        rightBtn.addEventListener('touchend', () => rightPressed = false);
+        rightBtn.addEventListener('mousedown', () => rightPressed = true);
+        rightBtn.addEventListener('mouseup', () => rightPressed = false);
+        rightBtn.addEventListener('mouseleave', () => rightPressed = false);
+        
+        pauseBtn.addEventListener('click', togglePause);
+        themeBtn.addEventListener('click', toggleTheme);
+        
+        // 防止觸控時的默認行為
+        [leftBtn, rightBtn].forEach(btn => {
+            btn.addEventListener('touchstart', (e) => e.preventDefault());
+            btn.addEventListener('touchend', (e) => e.preventDefault());
+        });
+        
+        // 炸彈按鈕
+        document.getElementById('bombButton').addEventListener('click', useBomb);
+        
+        // 初始化
+        window.addEventListener('resize', resizeCanvas);
+        window.addEventListener('load', () => {
+            resizeCanvas();
+            startGame();
+            gameLoop();
+        });
+    </script>
+</body>
+</html>
