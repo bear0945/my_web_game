@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>『因果律崩壞』中二角色設定產生器</title>
+    <style>
+        /* =========================================
+           【固有結界：CSS 樣式表】
+           警告：長時間注視可能導致視網膜灼傷或SAN值狂掉
+           ========================================= */
+        :root {
+            --abyss-black: #0f0f0f;
+            --blood-red: #ff0033;
+            --magic-purple: #b026ff;
+            --holy-gold: #ffd700;
+            --terminal-green: #00ff41;
+        }
+
+        body {
+            background-color: var(--abyss-black);
+            color: #e0e0e0;
+            font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: 
+                linear-gradient(rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.9)),
+                url('https://www.transparenttextures.com/patterns/stardust.png');
+        }
+
+        /* 容器：世界線觀測站 */
+        .container {
+            width: 90%;
+            max-width: 600px;
+            background: rgba(20, 20, 20, 0.95);
+            border: 2px solid var(--magic-purple);
+            box-shadow: 0 0 20px var(--magic-purple), inset 0 0 30px rgba(0,0,0,0.8);
+            padding: 2rem;
+            border-radius: 10px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            animation: breathe 4s infinite ease-in-out;
+        }
+
+        /* 標題特效 */
+        h1 {
+            font-size: 2rem;
+            color: var(--blood-red);
+            text-shadow: 2px 2px 0px #fff, -1px -1px 10px var(--blood-red);
+            margin-bottom: 0.5rem;
+            letter-spacing: 2px;
+        }
+        
+        .subtitle {
+            font-size: 0.9rem;
+            color: var(--magic-purple);
+            margin-bottom: 2rem;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* 輸入區域 */
+        .input-group {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        input[type="text"] {
+            width: 80%;
+            padding: 15px;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid var(--terminal-green);
+            color: var(--terminal-green);
+            font-size: 1.2rem;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+            transition: 0.3s;
+        }
+        input[type="text"]:focus {
+            outline: none;
+            border-bottom-color: var(--blood-red);
+            box-shadow: 0 10px 20px -10px var(--blood-red);
+        }
+
+        /* 召喚按鈕 */
+        .summon-btn {
+            background: linear-gradient(45deg, #3a0000, #800000);
+            color: #fff;
+            border: 1px solid var(--blood-red);
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            transition: 0.3s;
+            clip-path: polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%);
+        }
+
+        .summon-btn:hover {
+            background: var(--blood-red);
+            box-shadow: 0 0 30px var(--blood-red);
+            transform: scale(1.05);
+        }
+        
+        .summon-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* 結果顯示區 */
+        #result-area {
+            margin-top: 2rem;
+            padding: 20px;
+            border: 1px dashed var(--holy-gold);
+            background: rgba(0, 0, 0, 0.6);
+            display: none; /* 初始隱藏 */
+            text-align: left;
+            position: relative;
+        }
+
+        /* 裝飾線條 */
+        .line-deco {
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--holy-gold), transparent);
+            margin: 10px 0;
+        }
+
+        /* 動畫 Keyframes */
+        @keyframes breathe {
+            0% { box-shadow: 0 0 15px var(--magic-purple); }
+            50% { box-shadow: 0 0 30px var(--magic-purple), 0 0 10px var(--blood-red); }
+            100% { box-shadow: 0 0 15px var(--magic-purple); }
+        }
+
+        @keyframes glitch-anim {
+            0% { transform: translate(0) }
+            20% { transform: translate(-2px, 2px) }
+            40% { transform: translate(-2px, -2px) }
+            60% { transform: translate(2px, 2px) }
+            80% { transform: translate(2px, -2px) }
+            100% { transform: translate(0) }
+        }
+
+        .shaking {
+            animation: glitch-anim 0.3s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        /* 文本樣式 */
+        .label { color: var(--holy-gold); font-weight: bold; }
+        .content { line-height: 1.6; font-size: 1rem; }
+        .skill-name { color: var(--blood-red); font-weight: bold; font-size: 1.2rem; }
+        .rare-tag { 
+            background: var(--holy-gold); color: #000; 
+            padding: 2px 8px; font-size: 0.8rem; border-radius: 4px; 
+            font-weight: bold; margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- 標題區 -->
+        <h1>† 因果律崩壞 †</h1>
+        <div class="subtitle">SYSTEM_ERROR: DELUSION_MATERIALIZATION_PROTOCOL_INITIATED</div>
+
+        <!-- 輸入區 -->
+        <div class="input-group">
+            <input type="text" id="userName" placeholder="在此輸入宿主真名..." autocomplete="off">
+        </div>
+
+        <!-- 按鈕 -->
+        <button class="summon-btn" onclick="releaseTheSeal()">
+            封印解除 (RELEASE)
+        </button>
+
+        <!-- 結果區 -->
+        <div id="result-area">
+            <div class="line-deco"></div>
+            <p><span class="label">【觀測對象】</span> <span id="res-name" style="color:var(--terminal-green)"></span></p>
+            <p><span class="label">【稱號】</span> <span id="res-title"></span></p>
+            <p><span class="label">【覺醒物語】</span> <br><span id="res-story" class="content"></span></p>
+            <div class="line-deco"></div>
+            <p><span class="label">【固有技能 (Skill)】</span></p>
+            <p id="res-skill" class="content" style="text-align: center; margin: 10px 0;"></p>
+            <div class="line-deco"></div>
+            <p style="font-size: 0.8rem; color: #888; text-align: center;">
+                系統評價：<span id="res-comment"></span>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        /* =========================================
+           【禁忌的術式：JavaScript 邏輯層】
+           開發者筆記：這裡充滿了亂數和網路爛梗，
+           請不要試圖理解其中的邏輯，用心去感受。
+           ========================================= */
+
+        // 資料庫：輕小說風格標題
+        const titles = [
+            "被放逐的F級最弱冒險者", 
+            "轉生後變成自動販賣機的", 
+            "擁有比魔王更強物理攻擊的補師",
+            "只想過平靜生活的高中生", 
+            "擁有漆黑烈焰使資格的", 
+            "深淵的凝視者",
+            "明明沒有外掛卻被誤認為大神的",
+            "社畜轉生之我要準時下班的"
+        ];
+
+        // 資料庫：中二故事模板 (包含迷因)
+        const stories = [
+            "在去便利商店買洋芋片的途中被卡車撞飛，醒來後發現自己躺在異世界，而且右手寄宿著傳說中的『黑炎龍』。雖然只想當個邊緣人，但身邊總是聚集著殘念系的後宮，真是歸剛欸。",
+            "原本是黑心公司的工程師，因為過勞死而穿越。在這個魔法世界裡，利用前世的程式設計知識改寫了世界的原始碼。口頭禪是『這就是大人的手段』。",
+            "前世是拯救了世界的勇者，但因為覺得太麻煩了，這一世決定隱藏實力做個路人甲。然而，溢出的霸氣總是會震碎周圍的玻璃，想要低調根本不可能 www。",
+            "擁有能夠看穿萬物『死亡線』的魔眼，但因為近視太深，常常把路邊的野狗看成魔王而發動攻擊。被公會列為『危險人物 (各種意義上)』。",
+            "被召喚到異世界後，發現自己的幸運值是負的。走在路上會被史萊姆嘲笑，喝水會塞牙縫。但卻意外覺醒了『社死抗性 EX』，成為了精神力最強的存在。"
+        ];
+
+        // 資料庫：必殺技 (迷因 + 中二)
+        const skills = [
+            { name: "星爆氣流斬 (雙刀流)", desc: "C8763！給我撐個10秒啊！", rare: "SSR" },
+            { name: "Explosion!!", desc: "一天只能發動一次，威力極大但打完會趴在地上。", rare: "SR" },
+            { name: "領域展開：無量空處", desc: "把大量的垃圾資訊灌入對手腦中，使其當機。", rare: "UR" },
+            { name: "我就爛 (Thumbs Up)", desc: "防禦力提升 999%，但尊嚴歸零。", rare: "R" },
+            { name: "辣個男人的自由", desc: "只要敵人受傷的世界完成了。發動後自動切換BGM。", rare: "SSR" },
+            { name: "量子速讀", desc: "雖然什麼都沒看進去，但氣勢上贏了。", rare: "N" },
+            { name: "型態變化：油膩 Peko", desc: "說話句尾強制加上 peko，嘲諷值 MAX。", rare: "SR" },
+            { name: "辣味鴨血", desc: "不知道為什麼覺醒的技能，總之很好吃。", rare: "N" }
+        ];
+
+        // 資料庫：系統評價
+        const comments = [
+            "教練，我好想打籃球啊...",
+            "這個戰鬥力...是怪物嗎！？",
+            "好油喔 peko。",
+            "人類的讚歌就是勇氣的讚歌！",
+            "錯的不是我，是這個世界。",
+            "警察叔叔，就是這個人 (指)。"
+        ];
+
+        // 亂數選擇器
+        function pickRandom(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        // 【主函數】封印解除
+        function releaseTheSeal() {
+            const nameInput = document.getElementById('userName');
+            const resultArea = document.getElementById('result-area');
+            const container = document.querySelector('.container');
+            
+            const name = nameInput.value.trim();
+
+            // 防呆機制：如果是空的
+            if (!name) {
+                alert("喂喂...連名字都不敢報上來嗎？\n這就是你的覺悟？(嘲笑)");
+                return;
+            }
+
+            // 播放特效：震動視窗
+            container.classList.add('shaking');
+            setTimeout(() => container.classList.remove('shaking'), 500);
+
+            // 生成設定
+            const title = pickRandom(titles);
+            const story = pickRandom(stories);
+            const skillData = pickRandom(skills);
+            const comment = pickRandom(comments);
+
+            // 組合完整稱號
+            const fullTitle = `『${title} ${name}』`;
+
+            // 渲染資料
+            document.getElementById('res-name').innerText = name;
+            document.getElementById('res-title').innerText = fullTitle;
+            document.getElementById('res-story').innerHTML = story;
+            document.getElementById('res-skill').innerHTML = 
+                `<span class="skill-name">${skillData.name}</span>` +
+                `<span class="rare-tag">${skillData.rare}</span><br>` +
+                `<span style="font-size:0.9rem; color:#aaa;">效果：${skillData.desc}</span>`;
+            document.getElementById('res-comment').innerText = comment;
+
+            // 顯示結果 (模擬載入延遲)
+            resultArea.style.display = 'none';
+            setTimeout(() => {
+                resultArea.style.display = 'block';
+                // 自動捲動到底部
+                resultArea.scrollIntoView({ behavior: 'smooth' });
+            }, 300);
+        }
+    </script>
+</body>
+</html>
