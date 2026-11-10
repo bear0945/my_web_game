@@ -5,14 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>塔防式打磚塊</title>
     <style>
+        :root { --game-max: 720px; } /* 遊戲區最大寬度：想要更寬或更窄就改這個數字 */
+        
         body {
             margin: 0;
             padding: 0;
-            background: linear-gradient(135deg, #FAF6F0, #E5E1E1);
+            background: linear-gradient(135deg, #fce4ec, #f8bbd9);
             font-family: Arial, sans-serif;
             display: flex;
-            flex-direction: column;
+            justify-content: center;
             height: 100vh;
+            height: 100dvh; /* 手機瀏覽器的網址列不會再蓋住下方按鈕 */
             overflow: hidden;
             transition: background 0.5s ease;
         }
@@ -25,119 +28,102 @@
             background: linear-gradient(180deg, #4A2C5A 0%, #2A3E6A 100%);
         }
         
+        .game-wrap {
+            width: 100%;
+            max-width: var(--game-max);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+        
         .game-header {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 20px;
-            background: rgba(255, 255, 255, 0.9);
-            font-size: 14px;
-            font-weight: bold;
+            display: grid;
+            grid-template-columns: 1fr 1.5fr 1fr 1.25fr; /* 四格固定比例：數字變長也不會互相擠壓 */
+            gap: 6px;
+            margin: 4px 10px;
+            padding: 4px 8px;
+            background: #fce4ec;
+            border-radius: 18px;
+            box-shadow: 0 3px 8px rgba(233,30,99,0.15);
         }
         
-        .game-info {
-            display: flex;
-            gap: 20px;
+        .stat {
+            min-width: 0;
+            background: #fff;
+            border-radius: 14px;
+            padding: 1px 4px 2px;
+            text-align: center;
+            line-height: 1.1;
+            box-shadow: inset 0 -2px 0 rgba(0,0,0,0.06);
         }
-        
-        .level { color: #D1B3F9; }
-        .score { color: #AEE7E3; }
-        .lives { color: #F8A1A1; }
-        .next-drop { color: #F9C4A0; }
+        .stat small { display: block; font-size: 10px; font-weight: bold; opacity: 0.85; }
+        .stat b { display: block; font-size: 14px; white-space: nowrap; overflow: hidden; }
+        .level { color: #ab47bc; }
+        .score { color: #1fa89a; }
+        .lives { color: #ec5b6e; }
+        .next-drop { color: #f08a24; }
         
         #gameCanvas {
             flex: 1;
+            min-height: 0; /* 讓畫布能隨視窗縮小，控制按鈕才不會掉出畫面 */
+            min-width: 0;
             display: block;
             background: linear-gradient(180deg, #F6F2B7 0%, #CFF6C8 100%);
             margin: 0 10px;
             border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 0 0 3px #fff, 0 4px 15px rgba(233,30,99,0.25);
         }
         
         .game-controls {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 20px;
-            background: rgba(255, 255, 255, 0.9);
+            margin: 6px 10px 0;
+            padding: 6px 12px 10px;
+            background: #fce4ec;
+            border-radius: 28px;
+            box-shadow: 0 3px 8px rgba(233,30,99,0.15);
         }
         
-        .game-controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 20px;
-            background: rgba(255, 255, 255, 0.9);
-        }
-        
-        .left-controls, .right-controls {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-        
-        .center-controls {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-        }
-        
-        .control-btn {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: #B5CFFA;
-            border: none;
-            font-size: 24px;
-            color: white;
-            cursor: pointer;
-            transition: all 0.2s;
-            user-select: none;
-        }
-        
-        .control-btn:active {
-            background: #A6D9F5;
-            transform: scale(0.95);
-        }
-        
-        .pause-btn {
-            background: #F9C4A0;
-            font-size: 16px;
-        }
-        
-        .theme-btn {
-            background: #FAD6A5;
-            font-size: 20px;
-        }
-        
-        .power-ups {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-        }
-        
-        .bomb-button {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: #F8A1A1;
-            border: none;
-            font-size: 24px;
-            color: white;
-            cursor: pointer;
+        /* 圓圓糖果按鈕：高光 + 內側陰影 + 底部厚度，按下時會壓下去 */
+        .control-btn, .bomb-button {
             position: relative;
-            transition: all 0.2s;
+            border: none;
+            border-radius: 50%;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            cursor: pointer;
+            user-select: none;
+            touch-action: manipulation;
+            background:
+                radial-gradient(circle at 32% 24%, rgba(255,255,255,0.85) 0 9%, rgba(255,255,255,0) 26%),
+                linear-gradient(160deg, var(--c1), var(--c2));
+            box-shadow:
+                inset 0 -5px 8px rgba(0,0,0,0.14),
+                inset 0 4px 6px rgba(255,255,255,0.45),
+                0 6px 0 var(--lip),
+                0 10px 14px rgba(233,30,99,0.28);
+            transition: transform 0.1s, box-shadow 0.1s;
         }
-        
-        .bomb-button:disabled {
-            background: #E5E1E1;
-            cursor: not-allowed;
-            opacity: 0.5;
+        .control-btn:active, .bomb-button:active:not(:disabled) {
+            transform: translateY(5px);
+            box-shadow:
+                inset 0 -3px 6px rgba(0,0,0,0.14),
+                inset 0 4px 6px rgba(255,255,255,0.45),
+                0 1px 0 var(--lip),
+                0 3px 6px rgba(233,30,99,0.25);
         }
-        
-        .bomb-button.active {
-            background: #F1C0E8;
-            animation: pulse 1s infinite;
-        }
+        .control-btn { width: 46px; height: 46px; --c1: #f8a1c4; --c2: #ec407a; --lip: #ad1457; }
+        .control-btn svg { display: block; filter: drop-shadow(0 1px 1px rgba(0,0,0,0.25)); }
+        .theme-btn { --c1: #ffd27a; --c2: #ffa726; --lip: #d17a00; }
+        .pause-btn { --c1: #ffb98a; --c2: #ff7043; --lip: #c2410c; font-size: 18px; }
+        .bomb-button { width: 50px; height: 50px; --c1: #ff9ab0; --c2: #f0506e; --lip: #b3243f; }
+        .bomb-button:disabled { --c1: #efd6e0; --c2: #dcc0cf; --lip: #c4a6b6; cursor: not-allowed; opacity: 0.8; }
+        .bomb-button.active { animation: pulse 1s infinite; }
         
         @keyframes pulse {
             0%, 100% { transform: scale(1); }
@@ -146,80 +132,130 @@
         
         .bomb-count {
             position: absolute;
-            top: -5px;
-            right: -5px;
-            background: #D1B3F9;
-            color: white;
-            border-radius: 50%;
-            width: 20px;
+            top: -6px;
+            right: -12px;
+            background: #fff;
+            color: #c2185b;
+            border: 2px solid #e91e63;
+            border-radius: 10px;
+            min-width: 20px;
             height: 20px;
-            font-size: 12px;
+            padding: 0 5px;
+            font-size: 11px;
+            font-weight: bold;
             display: flex;
             align-items: center;
             justify-content: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
         
-        .current-buffs {
+        /* 目前道具效果：白色膠囊托盤，裡面是一顆顆糖果泡泡 */
+        .buffs-bar {
             display: flex;
-            gap: 5px;
-            font-size: 20px;
+            align-items: center;
+            justify-content: center;
+            margin: 8px 14px 8px;
+            padding: 3px 12px;
+            min-height: 34px;
+            background: #fff;
+            border-radius: 999px;
+            box-shadow: inset 0 3px 6px rgba(233,30,99,0.15), 0 0 0 3px #fce4ec;
         }
+        .current-buffs { display: flex; gap: 8px; align-items: center; justify-content: center; flex-wrap: wrap; font-size: 14px; }
+        .buff-empty { font-size: 12px; font-weight: bold; color: #d9a3bb; }
+        .buff-chip {
+            position: relative;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background:
+                radial-gradient(circle at 32% 24%, rgba(255,255,255,0.9) 0 10%, rgba(255,255,255,0) 28%),
+                linear-gradient(160deg, #ffd6e7, #f8a1c4);
+            box-shadow: inset 0 -3px 5px rgba(0,0,0,0.1), 0 2px 0 #e58ab0;
+        }
+        .buff-chip small {
+            position: absolute;
+            right: -10px;
+            bottom: -7px;
+            min-width: 15px;
+            height: 15px;
+            padding: 0 3px;
+            border-radius: 8px;
+            background: #e91e63;
+            color: #fff;
+            font-size: 9px;
+            line-height: 15px;
+            text-align: center;
+        }
+        
+        .bomb-count.full { background: #e91e63; color: #fff; border-color: #fff; }
+        
+        body.night-theme .game-header,
+        body.night-theme .game-controls { background: rgba(255,255,255,0.16); }
         
         .game-over {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(255, 255, 255, 0.95);
-            padding: 30px;
-            border-radius: 20px;
+            z-index: 5;
+            background: #fff;
+            border: 3px solid #e91e63;
+            padding: 26px 34px;
+            border-radius: 24px;
             text-align: center;
             display: none;
+            box-shadow: 0 10px 30px rgba(233,30,99,0.35);
+            color: #333;
         }
+        .game-over h2 { margin: 0 0 8px; color: #c2185b; }
         
         .restart-btn {
-            background: #B5CFFA;
-            color: white;
             border: none;
-            padding: 12px 24px;
-            border-radius: 25px;
+            color: #fff;
+            font: inherit;
             font-size: 16px;
+            font-weight: bold;
+            padding: 12px 28px;
+            border-radius: 999px;
             cursor: pointer;
             margin-top: 15px;
+            background: linear-gradient(160deg, #f8a1c4, #ec407a);
+            box-shadow: inset 0 -4px 6px rgba(0,0,0,0.14), inset 0 3px 5px rgba(255,255,255,0.5), 0 5px 0 #ad1457;
         }
+        .restart-btn:active { transform: translateY(4px); box-shadow: inset 0 -3px 5px rgba(0,0,0,0.14), 0 1px 0 #ad1457; }
     </style>
 </head>
 <body>
+    <div class="game-wrap">
     <div class="game-header">
-        <div class="game-info">
-            <div class="level">等級: <span id="level">1</span></div>
-            <div class="score">分數: <span id="score">0</span></div>
-            <div class="lives">生命: <span id="lives">3</span></div>
-        </div>
-        <div class="next-drop">下次下降: <span id="nextDrop">90</span>s</div>
+        <div class="stat level"><small>等級</small><b id="level">1</b></div>
+        <div class="stat score"><small>分數</small><b id="score">0</b></div>
+        <div class="stat lives"><small>生命</small><b id="lives">3</b></div>
+        <div class="stat next-drop"><small>下次下降</small><b><span id="nextDrop">40</span>s</b></div>
     </div>
     
     <canvas id="gameCanvas"></canvas>
     
     <div class="game-controls">
-        <div class="left-controls">
-            <button class="control-btn" id="leftBtn">◀</button>
-        </div>
-        
-        <div class="center-controls">
-            <button class="control-btn pause-btn" id="pauseBtn">⏸️</button>
-            <button class="control-btn theme-btn" id="themeBtn">☀️</button>
-            <div class="current-buffs" id="currentBuffs"></div>
-        </div>
-        
-        <div class="right-controls">
-            <button class="bomb-button" id="bombButton" disabled>💣
-                <div class="bomb-count" id="bombCount">0</div>
-            </button>
-            <button class="control-btn" id="rightBtn">▶</button>
-        </div>
+        <button class="control-btn" id="leftBtn" aria-label="向左"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M16 4 L7 12 L16 20 Z" fill="#fff"/></svg></button>
+        <button class="bomb-button" id="bombButton" disabled>💣
+            <div class="bomb-count" id="bombCount">0/3</div>
+        </button>
+        <button class="control-btn theme-btn" id="themeBtn">☀️</button>
+        <button class="control-btn pause-btn" id="pauseBtn">⏸️</button>
+        <button class="control-btn" id="rightBtn" aria-label="向右"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M8 4 L17 12 L8 20 Z" fill="#fff"/></svg></button>
     </div>
     
+    <div class="buffs-bar">
+        <div class="current-buffs" id="currentBuffs"></div>
+    </div>
+
+    </div>
+
     <div class="game-over" id="gameOver">
         <h2>遊戲結束</h2>
         <p>最終分數: <span id="finalScore">0</span></p>
@@ -244,11 +280,12 @@
             level: 1,
             score: 0,
             lives: 3,
-            nextDropTime: 90,
+            nextDropTime: 40,
             dropTimer: 0,
             bombCount: 0,
             isGameOver: false,
             isPaused: false,
+            launched: false,
             isNightTheme: false,
             buffs: {}
         };
@@ -258,10 +295,28 @@
         let balls = [];
         let bricks = [];
         let powerUps = [];
+        let gameCols = 10; // 本局磚塊欄數：開局時依畫面寬度決定，之後固定
+        const MAX_BOMBS = 3; // 炸彈持有上限
+        const CLEAR_DROP_DELAY = 1.5; // 場上磚塊全部清空後，幾秒內下降新的一排（想要更快或更慢就改這個數字）
+        function countBricks() {
+            let n = 0;
+            for (const row of bricks) if (row) for (const b of row) if (b) n++;
+            return n;
+        }
         
         // 控制
         let leftPressed = false;
         let rightPressed = false;
+        
+        function getCurrentTargetSpeed() {
+            let baseSpeed = 4;
+            if (gameState.buffs.speed) {
+                return baseSpeed * 1.5;
+            } else if (gameState.buffs.slow) {
+                return baseSpeed * 0.7;
+            }
+            return baseSpeed;
+        }
         
         function resizeCanvas() {
             canvas.width = canvas.offsetWidth;
@@ -277,10 +332,11 @@
                 balls.forEach(ball => {
                     ball.x = Math.min(ball.x, canvas.width - ball.radius);
                     ball.x = Math.max(ball.x, ball.radius);
+                    ball.y = Math.min(ball.y, paddle.y - ball.radius);
                 });
                 
                 // 調整磚塊位置（按比例縮放）
-                const newCols = Math.floor(canvas.width / 50);
+                const newCols = gameCols;
                 const newBrickWidth = canvas.width / newCols;
                 
                 for (let row = 0; row < bricks.length; row++) {
@@ -306,6 +362,58 @@
             }
         }
         
+        // 球黏在球拍上，等玩家點球拍或按空白鍵才發射
+        function newAttachedBall(offset = 0) {
+            return { x: paddle.x + paddle.width / 2 + offset, y: paddle.y - 9, dx: 0, dy: 0, radius: 8,
+                     hasBomb: false, isPenetrating: false, attached: true, offset };
+        }
+        
+        function launchBall() {
+            if (gameState.isGameOver || gameState.isPaused) return false;
+            const speed = getCurrentTargetSpeed();
+            let launched = false;
+            balls.forEach(ball => {
+                if (!ball.attached) return;
+                ball.attached = false;
+                // 往上發射，帶 20°~40° 的隨機偏角（左右隨機），不會直直往上
+                const angle = (Math.random() < 0.5 ? -1 : 1) * (20 + Math.random() * 20) * Math.PI / 180;
+                ball.dx = Math.sin(angle) * speed;
+                ball.dy = -Math.cos(angle) * speed;
+                launched = true;
+            });
+            if (launched) gameState.launched = true; // 第一次發射後，下降倒數才開始跑
+            return launched;
+        }
+        
+        const isTouchDevice = window.matchMedia('(hover: none)').matches;
+        function drawLaunchHint() {
+            if (gameState.isPaused || gameState.isGameOver || !balls.some(b => b.attached)) return;
+            const text = isTouchDevice ? '點一下球拍發射' : '點球拍或按空白鍵發射';
+            ctx.save();
+            ctx.font = 'bold 14px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            const w = ctx.measureText(text).width + 24, h = 28;
+            const cx = Math.max(w / 2 + 6, Math.min(canvas.width - w / 2 - 6, paddle.x + paddle.width / 2));
+            const cy = paddle.y - 42, x = cx - w / 2, y = cy - h / 2, r = h / 2;
+            ctx.globalAlpha = 0.8 + 0.2 * Math.sin(Date.now() / 250);
+            ctx.beginPath();
+            ctx.moveTo(x + r, y);
+            ctx.arcTo(x + w, y, x + w, y + h, r);
+            ctx.arcTo(x + w, y + h, x, y + h, r);
+            ctx.arcTo(x, y + h, x, y, r);
+            ctx.arcTo(x, y, x + w, y, r);
+            ctx.closePath();
+            ctx.fillStyle = '#ec407a';
+            ctx.fill();
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = '#fff';
+            ctx.stroke();
+            ctx.fillStyle = '#fff';
+            ctx.fillText(text, cx, cy + 1);
+            ctx.restore();
+        }
+        
         function initGame() {
             // 初始化球拍
             paddle = {
@@ -319,24 +427,17 @@
             };
             
             // 初始化球
-            balls = [{
-                x: canvas.width / 2,
-                y: canvas.height - 100,
-                dx: 3,
-                dy: -3,
-                radius: 8,
-                hasBomb: false,
-                isPenetrating: false
-            }];
+            balls = [newAttachedBall()];
             
             // 初始化磚塊
             bricks = [];
+            gameCols = Math.max(6, Math.floor(canvas.width / 50));
             generateInitialBricks();
         }
         
         function generateInitialBricks() {
             const rows = 8;
-            const cols = Math.floor(canvas.width / 50);
+            const cols = gameCols;
             const brickWidth = canvas.width / cols;
             const brickHeight = 25;
             
@@ -375,7 +476,7 @@
             }
             
             // 生成新的一排
-            const cols = Math.floor(canvas.width / 50);
+            const cols = gameCols;
             const brickWidth = canvas.width / cols;
             const newRow = [];
             
@@ -487,6 +588,7 @@
                 case 'multiball':
                     if (balls.length < 3) {
                         const originalBall = balls[0];
+                        if (originalBall.attached) { balls.push(newAttachedBall(balls.length % 2 ? 16 : -16)); break; }
                         balls.push({
                             x: originalBall.x + 20,
                             y: originalBall.y,
@@ -503,7 +605,7 @@
                     gameState.buffs.penetrate = { time: 600, emoji: '🔥' };
                     break;
                 case 'bomb':
-                    gameState.bombCount = Math.min(gameState.bombCount + 1, 3);
+                    gameState.bombCount = Math.min(gameState.bombCount + 1, MAX_BOMBS);
                     updateBombButton();
                     break;
                 case 'life':
@@ -525,14 +627,17 @@
             updateBuffDisplay();
         }
         
+        let lastBuffHtml = null;
         function updateBuffDisplay() {
             const buffsDiv = document.getElementById('currentBuffs');
-            buffsDiv.innerHTML = '';
+            let html = '';
             for (let [key, buff] of Object.entries(gameState.buffs)) {
                 if (buff.time > 0) {
-                    buffsDiv.innerHTML += buff.emoji;
+                    html += `<span class="buff-chip">${buff.emoji}<small>${Math.ceil(buff.time / 60)}</small></span>`;
                 }
             }
+            if (!html) html = '<span class="buff-empty">目前沒有道具效果</span>';
+            if (html !== lastBuffHtml) { buffsDiv.innerHTML = html; lastBuffHtml = html; }
         }
         
         function updateBombButton() {
@@ -541,8 +646,8 @@
             
             bombButton.disabled = gameState.bombCount === 0;
             bombButton.className = gameState.bombCount > 0 ? 'bomb-button active' : 'bomb-button';
-            bombCount.textContent = gameState.bombCount;
-            bombCount.style.display = gameState.bombCount > 0 ? 'flex' : 'none';
+            bombCount.textContent = gameState.bombCount + '/' + MAX_BOMBS;
+            bombCount.classList.toggle('full', gameState.bombCount >= MAX_BOMBS); // 滿了就變成實心粉紅
         }
         
         function useBomb() {
@@ -590,8 +695,13 @@
             }
             
             // 更新下降計時器
-            if (!gameState.buffs.timefreeze) {
+            if (!gameState.buffs.timefreeze && gameState.launched) {
                 gameState.dropTimer++;
+                // 磚塊清空時不用乾等：把倒數縮短到 CLEAR_DROP_DELAY 秒
+                if (countBricks() === 0) {
+                    const cutoff = (gameState.nextDropTime - CLEAR_DROP_DELAY) * 60;
+                    if (gameState.dropTimer < cutoff) gameState.dropTimer = cutoff;
+                }
                 if (gameState.dropTimer >= gameState.nextDropTime * 60) { // 60 FPS
                     dropNewRow();
                 }
@@ -607,15 +717,56 @@
             
             // 更新球
             balls.forEach((ball, ballIndex) => {
+                if (ball.attached) { // 等待發射：跟著球拍走
+                    ball.x = paddle.x + paddle.width / 2 + (ball.offset || 0);
+                    ball.y = paddle.y - ball.radius - 1;
+                    return;
+                }
                 ball.x += ball.dx;
                 ball.y += ball.dy;
                 
-                // 邊界碰撞
+                // 邊界碰撞：依方向反彈，並把球放回牆內
+                // （只把 dx 反過來的話，球一旦超出牆面超過一步，下一幀還在牆外又會被反轉，就會卡在牆外一直被「擠」出去）
                 if (ball.x <= ball.radius || ball.x >= canvas.width - ball.radius) {
-                    ball.dx = -ball.dx;
+                    const atLeft = ball.x <= ball.radius;
+                    ball.x = atLeft ? ball.radius : canvas.width - ball.radius;
+                    ball.dx = atLeft ? Math.abs(ball.dx) : -Math.abs(ball.dx);
+                    // 加入微小隨機角度變化，避免球卡在邊緣直直彈跳
+                    ball.dy += (Math.random() - 0.5) * 0.8;
+                    // 確保球不會太過水平或垂直移動
+                    if (Math.abs(ball.dy) < 1) {
+                        ball.dy = ball.dy > 0 ? 1 : -1;
+                    }
+                    if (Math.abs(ball.dx) < 1) {
+                        ball.dx = ball.dx > 0 ? 1 : -1;
+                    }
+                    
+                    // 速度正常化 - 考慮當前 buff 狀態
+                    let currentSpeed = Math.sqrt(ball.dx * ball.dx + ball.dy * ball.dy);
+                    let targetSpeed = getCurrentTargetSpeed();
+                    if (currentSpeed > 0.5) { // 避免除以極小數
+                        ball.dx = (ball.dx / currentSpeed) * targetSpeed;
+                        ball.dy = (ball.dy / currentSpeed) * targetSpeed;
+                    }
+                    ball.dx = atLeft ? Math.abs(ball.dx) : -Math.abs(ball.dx); // 確保一定是往場內
                 }
                 if (ball.y <= ball.radius) {
-                    ball.dy = -ball.dy;
+                    ball.dy = Math.abs(ball.dy); // 確保向下反彈
+                    // 頂部碰撞也加入小幅隨機化
+                    ball.dx += (Math.random() - 0.5) * 0.5;
+                    
+                    // 速度正常化 - 考慮當前 buff 狀態
+                    let currentSpeed = Math.sqrt(ball.dx * ball.dx + ball.dy * ball.dy);
+                    let targetSpeed = getCurrentTargetSpeed();
+                    if (currentSpeed > 0.5) {
+                        ball.dx = (ball.dx / currentSpeed) * targetSpeed;
+                        ball.dy = Math.abs((ball.dy / currentSpeed) * targetSpeed); // 確保 dy 是正數
+                    }
+                    
+                    // 確保球確實會向下移動
+                    if (ball.dy <= 0) {
+                        ball.dy = 2; // 強制向下的最小速度
+                    }
                 }
                 
                 // 球掉出畫面
@@ -627,16 +778,8 @@
                             gameOver();
                             return;
                         } else {
-                            // 重新發球
-                            balls.push({
-                                x: canvas.width / 2,
-                                y: canvas.height - 100,
-                                dx: 3,
-                                dy: -3,
-                                radius: 8,
-                                hasBomb: false,
-                                isPenetrating: false
-                            });
+                            // 球回到球拍上，等玩家點球拍或按空白鍵再發射
+                            balls.push(newAttachedBall());
                         }
                     }
                 }
@@ -653,31 +796,53 @@
                     let hitPos = (ball.x - paddle.x) / paddle.width;
                     hitPos = Math.max(0, Math.min(1, hitPos)); // 限制範圍
                     ball.dx = (hitPos - 0.5) * 6;
+                    
+                    // 確保球速保持合理範圍，考慮當前 buff 狀態
+                    let currentSpeed = Math.sqrt(ball.dx * ball.dx + ball.dy * ball.dy);
+                    let targetSpeed = getCurrentTargetSpeed();
+                    if (currentSpeed > 0) {
+                        ball.dx = (ball.dx / currentSpeed) * targetSpeed;
+                        ball.dy = (ball.dy / currentSpeed) * targetSpeed;
+                    }
                 }
                 
-                // 磚塊碰撞
+                // 磚塊碰撞：把球的半徑算進去，球擦到磚塊邊緣也算擊中
+                const hits = [];
                 for (let row = 0; row < bricks.length; row++) {
                     if (!bricks[row]) continue;
                     for (let col = 0; col < bricks[row].length; col++) {
-                        let brick = bricks[row][col];
+                        const brick = bricks[row][col];
                         if (!brick) continue;
-                        
-                        if (ball.x >= brick.x && ball.x <= brick.x + brick.width &&
-                            ball.y >= brick.y && ball.y <= brick.y + brick.height) {
-                            
-                            if (ball.hasBomb) {
-                                explodeBomb(ball, row, col);
-                            } else {
-                                bricks[row][col] = null;
-                                gameState.score += 10;
-                                generatePowerUp(brick.x + brick.width/2, brick.y + brick.height);
-                            }
-                            
-                            if (!ball.isPenetrating) {
-                                ball.dy = -ball.dy;
-                            }
-                            break;
+                        // 球心到磚塊矩形最近點的距離
+                        const nearX = Math.max(brick.x, Math.min(ball.x, brick.x + brick.width));
+                        const nearY = Math.max(brick.y, Math.min(ball.y, brick.y + brick.height));
+                        const dist2 = (ball.x - nearX) ** 2 + (ball.y - nearY) ** 2;
+                        if (dist2 > ball.radius * ball.radius) continue;
+                        // 一般球只有「朝著磚塊移動」才算擊中：反彈離開後不會又擦到隔壁磚塊再被翻回去
+                        const midY = brick.y + brick.height / 2;
+                        const approaching = ball.dy === 0 || (ball.dy < 0 && ball.y >= midY) || (ball.dy > 0 && ball.y <= midY);
+                        if (!ball.isPenetrating && !approaching) continue;
+                        hits.push({ row, col, brick, dist2 });
+                    }
+                }
+                if (hits.length > 0) {
+                    hits.sort((a, b) => a.dist2 - b.dist2);
+                    // 一般球每幀只處理最近的一塊；穿透球會穿過所有重疊的磚塊
+                    const targets = ball.isPenetrating ? hits : [hits[0]];
+                    for (const h of targets) {
+                        if (!bricks[h.row][h.col]) continue; // 可能已被炸彈炸掉
+                        if (ball.hasBomb) {
+                            explodeBomb(ball, h.row, h.col);
+                        } else {
+                            bricks[h.row][h.col] = null;
+                            gameState.score += 10;
+                            generatePowerUp(h.brick.x + h.brick.width / 2, h.brick.y + h.brick.height);
                         }
+                    }
+                    if (!ball.isPenetrating) {
+                        // 依球在磚塊上方或下方決定反彈方向（不會因為重複判定而來回翻轉）
+                        const first = hits[0].brick;
+                        ball.dy = ball.y < first.y + first.height / 2 ? -Math.abs(ball.dy) : Math.abs(ball.dy);
                     }
                 }
             });
@@ -774,10 +939,21 @@
                 ctx.textAlign = 'center';
                 ctx.fillText(powerUp.emoji, powerUp.x, powerUp.y);
             });
+            
+            drawLaunchHint();
         }
         
-        function gameLoop() {
-            updateGame();
+        // 遊戲邏輯是照「每秒 60 次更新」調的，所以用固定步長；高更新率螢幕不會變快
+        const STEP = 1000 / 60;
+        let lastTime = 0, accTime = 0;
+        function gameLoop(t) {
+            if (!lastTime) lastTime = t;
+            accTime += Math.min(t - lastTime, 100); // 切分頁回來時最多補 100ms，避免瞬間跳很多格
+            lastTime = t;
+            while (accTime >= STEP) {
+                updateGame();
+                accTime -= STEP;
+            }
             drawGame();
             requestAnimationFrame(gameLoop);
         }
@@ -799,6 +975,7 @@
                 bombCount: 0,
                 isGameOver: false,
                 isPaused: false,
+            launched: false,
                 isNightTheme: false,
                 buffs: {}
             };
@@ -852,7 +1029,10 @@
                     e.preventDefault();
                     break;
                 case ' ':
-                    togglePause();
+                    if (!e.repeat) { // 按住不放不要連續觸發（否則發射後會立刻被暫停）
+                        if (!gameState.isPaused && !gameState.isGameOver && balls.some(b => b.attached)) launchBall();
+                        else togglePause();
+                    }
                     e.preventDefault();
                     break;
                 case 't':
@@ -892,7 +1072,20 @@
         rightBtn.addEventListener('mouseleave', () => rightPressed = false);
         
         pauseBtn.addEventListener('click', togglePause);
+        
+        // 點球拍發射：球拍左右各多 30px、上方 45px 到畫面底部都算點到
+        canvas.addEventListener('pointerdown', (e) => {
+            if (!balls.some(b => b.attached)) return;
+            const rect = canvas.getBoundingClientRect();
+            const x = (e.clientX - rect.left) * (canvas.width / rect.width);
+            const y = (e.clientY - rect.top) * (canvas.height / rect.height);
+            if (x >= paddle.x - 30 && x <= paddle.x + paddle.width + 30 && y >= paddle.y - 45) launchBall();
+        });
         themeBtn.addEventListener('click', toggleTheme);
+        
+        leftBtn.addEventListener('touchcancel', () => leftPressed = false);
+        rightBtn.addEventListener('touchcancel', () => rightPressed = false);
+        window.addEventListener('blur', () => { leftPressed = false; rightPressed = false; });
         
         // 防止觸控時的默認行為
         [leftBtn, rightBtn].forEach(btn => {
@@ -908,7 +1101,7 @@
         window.addEventListener('load', () => {
             resizeCanvas();
             startGame();
-            gameLoop();
+            requestAnimationFrame(gameLoop);
         });
     </script>
 </body>
