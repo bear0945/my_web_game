@@ -110,4 +110,1209 @@
         .upgrade-btn.maxed {
             background: #5A9E6F;
             color: #FFFFFF;
-            cursor:
+            cursor: default;
+        }
+
+        .pause-btn {
+            background: #FF8C00;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: bold;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(255, 140, 0, 0.3);
+        }
+
+        .pause-btn:hover {
+            background: #E07B00;
+            transform: translateY(-1px);
+        }
+
+        .pause-btn.paused {
+            background: #28A745;
+            animation: pulse 1.2s infinite;
+        }
+
+        .finish-btn {
+            background: #17A2B8;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: bold;
+            display: none;
+        }
+
+        .finish-btn:hover {
+            background: #138496;
+        }
+
+        .farm-wrapper {
+            position: relative;
+            margin: 15px auto;
+        }
+        
+        .farm-grid {
+            --plot-size: 60px;
+            --plot-gap: 8px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: var(--plot-gap);
+            margin: 0 auto;
+            max-width: 320px;
+            transition: filter 0.3s ease;
+        }
+
+        .farm-grid.paused-blur {
+            filter: blur(4px) grayscale(40%);
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .pause-banner {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-size: 1.4em;
+            font-weight: bold;
+            z-index: 10;
+            pointer-events: none;
+            white-space: nowrap;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .pause-banner.active {
+            display: block;
+        }
+        
+        .plot {
+            flex: none;
+            width: var(--plot-size);
+            height: var(--plot-size);
+            border: 3px solid #8B4513;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.15s ease, background 0.3s ease;
+            font-size: 1.5em;
+            background: #DEB887;
+            user-select: none;
+        }
+        
+        @media (min-width: 480px) {
+            .farm-grid {
+                --plot-size: 80px;
+            }
+            .plot {
+                font-size: 2em;
+            }
+        }
+        
+        .plot:hover {
+            transform: scale(1.06);
+            border-color: #654321;
+        }
+
+        .plot:active {
+            transform: scale(0.95);
+        }
+        
+        .plot.planted {
+            background: #90EE90;
+        }
+        
+        .plot.ready {
+            background: #FFD700;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+        }
+        
+        .plot.bear {
+            background: #8B4513;
+            animation: shake 0.5s infinite;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-6deg); }
+            75% { transform: rotate(6deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .plot.wild-boar {
+            background: #A0522D;
+            animation: shake 0.3s infinite, danger-glow 0.8s infinite alternate;
+        }
+        
+        @keyframes danger-glow {
+            from { box-shadow: 0 0 5px #FF0000; border-color: #FF0000; }
+            to { box-shadow: 0 0 18px #FF4444; border-color: #FFAA00; }
+        }
+        
+        .plot.destroyed {
+            background: #696969;
+            cursor: not-allowed;
+        }
+        
+        .plot.destroyed:hover {
+            transform: none;
+            border-color: #8B4513;
+        }
+        
+        .game-over-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.82);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 15px;
+        }
+        
+        .game-over-modal {
+            background: white;
+            padding: 30px 25px;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 440px;
+            width: 100%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .game-over-title {
+            color: #DC3545;
+            font-size: 1.9em;
+            margin-bottom: 12px;
+        }
+
+        .victory-title {
+            color: #17A2B8;
+            font-size: 1.8em;
+            margin-bottom: 12px;
+        }
+        
+        .final-score {
+            font-size: 1.25em;
+            color: #28A745;
+            margin: 15px 0;
+            line-height: 1.6;
+            font-weight: bold;
+        }
+
+        .winter-stamp {
+            display: inline-block;
+            border: 4px double #007BFF;
+            color: #007BFF;
+            background: rgba(240, 248, 255, 0.92);
+            padding: 6px 18px;
+            font-size: 1.35em;
+            font-weight: 900;
+            border-radius: 8px;
+            transform: rotate(-8deg);
+            margin: 10px 0 5px 0;
+            box-shadow: 0 3px 10px rgba(0, 123, 255, 0.25);
+            letter-spacing: 2px;
+            animation: stamp-pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes stamp-pop {
+            0% { transform: scale(2.5) rotate(-15deg); opacity: 0; }
+            100% { transform: scale(1) rotate(-8deg); opacity: 1; }
+        }
+        
+        .restart-btn {
+            background: #007BFF;
+            color: white;
+            border: none;
+            padding: 12px 22px;
+            border-radius: 8px;
+            font-size: 1.05em;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 8px 5px;
+            transition: background 0.2s;
+        }
+        
+        .restart-btn:hover {
+            background: #0056B3;
+        }
+
+        .endless-btn {
+            background: #28A745;
+        }
+
+        .endless-btn:hover {
+            background: #1E7E34;
+        }
+        
+        .leaderboard {
+            background: #F8F9FA;
+            border-radius: 8px;
+            padding: 12px 15px;
+            margin: 15px 0;
+            max-height: 200px;
+            overflow-y: auto;
+            text-align: left;
+        }
+        
+        .leaderboard h4 {
+            margin-bottom: 10px;
+            color: #495057;
+            text-align: center;
+        }
+        
+        .score-entry {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 4px;
+            border-bottom: 1px solid #DEE2E6;
+            font-size: 0.95em;
+        }
+
+        .score-entry.current-score {
+            background: #FFF3CD;
+            font-weight: bold;
+            border-radius: 4px;
+        }
+        
+        .score-entry:last-child {
+            border-bottom: none;
+        }
+        
+        .shop {
+            background: #F5F5DC;
+            border: 2px solid #D2691E;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .shop h3 {
+            color: #8B4513;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+        
+        .seeds {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .seed-option {
+            background: #FFF8DC;
+            border: 2px solid #DAA520;
+            border-radius: 8px;
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            min-width: 112px;
+            user-select: none;
+        }
+        
+        .seed-option:hover {
+            background: #F0E68C;
+            transform: translateY(-2px);
+        }
+        
+        .seed-option.selected {
+            background: #FFD700;
+            border-color: #B8860B;
+            box-shadow: 0 2px 8px rgba(184, 134, 11, 0.3);
+        }
+        
+        .seed-name {
+            font-weight: bold;
+            color: #8B4513;
+            margin-bottom: 2px;
+        }
+        
+        .seed-price {
+            color: #006400;
+            font-size: 0.88em;
+            font-weight: bold;
+        }
+        
+        .seed-time {
+            color: #555;
+            font-size: 0.78em;
+            margin-top: 2px;
+        }
+        
+        .message {
+            text-align: center;
+            padding: 10px 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            font-weight: bold;
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="header">
+            <h1 class="title">🌱 快樂農場 🌱</h1>
+            <div class="subtitle">1~24級安心種田發育，25級山豬出沒，撐到50級迎接冬天！（P 或 空白鍵 暫停）</div>
+        </div>
+        
+        <div class="stats">
+            <div class="stat">💰 現有金幣: <span id="money">250</span></div>
+            <div class="stat">📈 累計金幣: <span id="totalEarned">0</span></div>
+            <div class="stat">📊 等級: <span id="level">1</span></div>
+            <div class="stat">⭐ 經驗: <span id="exp">0</span>/<span id="expNeeded">5</span></div>
+        </div>
+        
+        <div class="upgrade-section">
+            <button class="upgrade-btn" id="upgradePlots"></button>
+            <button class="upgrade-btn" id="upgradeSpeed"></button>
+            <button class="pause-btn" id="pauseBtn">⏸️ 暫停遊戲 (P)</button>
+            <button class="finish-btn" id="finishEndlessBtn">🏆 隨時結算</button>
+        </div>
+        
+        <div class="farm-wrapper">
+            <div class="farm-grid" id="farmGrid"></div>
+            <div class="pause-banner" id="pauseBanner">⏸️ 遊戲已暫停</div>
+        </div>
+        
+        <div id="message" class="message" style="background: #FFF3CD; color: #856404; border: 2px solid #FFEAA7;">
+            歡迎來到快樂農場！趁 25 級山豬出沒前，盡情擴展農田、存錢種南瓜吧！
+        </div>
+        
+        <div class="shop">
+            <h3>🛒 種子商店</h3>
+            <div class="seeds" id="seedShop"></div>
+        </div>
+    </div>
+
+    <script>
+        class FarmGame {
+            constructor() {
+                this.money = 250; // 初始資金微調至 250，開局更順暢
+                this.totalEarned = 0;
+                this.level = 1;
+                this.exp = 0;
+                this.expNeeded = 5;
+                this.selectedSeed = 'carrot';
+                
+                // 農田與速度上限設定
+                this.plots = [];
+                this.plotCount = 6;
+                this.maxPlots = 20;          // 農田上限 20 格 (4x5)
+                this.plotUpgradeCost = 180;  // 初始擴展 180，每次 x1.35
+                
+                this.speedMultiplier = 1.0;
+                this.maxSpeed = 10.0;        // 速度上限 10 倍
+                this.speedUpgradeCost = 120; // 初始加速 120，每次 x1.25（更容易在山豬變多前升上去）
+                
+                // 提高中後期作物的投資報酬率，讓南瓜能更快實現財富自由
+                this.seeds = {
+                    carrot:     { name: '胡蘿蔔', price: 20,   time: 3500,  value: 40,   exp: 2, emoji: '🥕' },
+                    potato:     { name: '馬鈴薯', price: 50,   time: 5500,  value: 95,   exp: 3, emoji: '🥔' },
+                    tomato:     { name: '番茄',   price: 120,  time: 8000,  value: 230,  exp: 4, emoji: '🍅' },
+                    corn:       { name: '玉米',   price: 300,  time: 10000, value: 550,  exp: 5, emoji: '🌽' },
+                    strawberry: { name: '草莓',   price: 700,  time: 13000, value: 1250, exp: 6, emoji: '🍓' },
+                    pumpkin:    { name: '南瓜',   price: 1500, time: 16000, value: 2600, exp: 8, emoji: '🎃' }
+                };
+                
+                this.bear = {
+                    present: false,
+                    targetPlot: null,
+                    remainingMs: 0
+                };
+                
+                this.wildBoar = {
+                    present: false,
+                    targetPlots: [],
+                    remainingMs: 0,
+                    destructionCount: 0
+                };
+                
+                // 山豬出沒等級設定為 25 級（22 級開始預警）
+                this.boarStartLevel = 25;
+                this.boarWarnLevel = 22;
+
+                this.paused = false;
+                this.modalOpen = false;
+                this.gameOver = false;
+                this.winterReached = false;
+                this.endlessMode = false;
+                this.gracePeriodMs = 0;
+
+                this.bearSpawnTimer = 0;
+                this.boarSpawnTimer = 0;
+                
+                this.initializePlots();
+                this.render();
+                this.bindEvents();
+                this.startGameLoop();
+            }
+
+            formatNum(num) {
+                return Number(num).toLocaleString('zh-TW');
+            }
+            
+            initializePlots() {
+                this.plots = Array(this.plotCount).fill(null).map(() => ({
+                    planted: false,
+                    seedType: null,
+                    remainingMs: 0,
+                    ready: false,
+                    destroyed: false
+                }));
+            }
+
+            isSimulationStopped() {
+                return this.paused || this.modalOpen || this.gameOver;
+            }
+            
+            render() {
+                this.updateStats();
+                this.renderFarm();
+                this.renderShop();
+                this.updateUpgradeCosts();
+            }
+            
+            updateStats() {
+                document.getElementById('money').textContent = this.formatNum(this.money);
+                document.getElementById('totalEarned').textContent = this.formatNum(this.totalEarned);
+                document.getElementById('level').textContent = this.formatNum(this.level);
+                document.getElementById('exp').textContent = this.formatNum(this.exp);
+                document.getElementById('expNeeded').textContent = this.formatNum(this.expNeeded);
+            }
+            
+            renderFarm() {
+                if (this.gameOver) return;
+                
+                const farmGrid = document.getElementById('farmGrid');
+                const cols = Math.min(4, Math.ceil(Math.sqrt(this.plotCount)));
+                farmGrid.style.maxWidth = `calc(${cols} * var(--plot-size) + ${cols - 1} * var(--plot-gap))`;
+                
+                while (farmGrid.children.length < this.plots.length) {
+                    const el = document.createElement('div');
+                    el.dataset.index = farmGrid.children.length;
+                    farmGrid.appendChild(el);
+                }
+                while (farmGrid.children.length > this.plots.length) {
+                    farmGrid.lastChild.remove();
+                }
+                
+                this.plots.forEach((plot, index) => {
+                    const el = farmGrid.children[index];
+                    let cls = 'plot', text, title;
+                    
+                    if (plot.destroyed) {
+                        cls += ' destroyed';
+                        text = '🪨';
+                        title = '農田已被山豬破壞，無法使用';
+                    } else if (this.wildBoar.present && this.wildBoar.targetPlots.includes(index)) {
+                        cls += ' wild-boar';
+                        text = '🐗';
+                        title = '山豬正在破壞農田！點擊驅趕（可搶救80%種子成本）！';
+                    } else if (this.bear.present && this.bear.targetPlot === index) {
+                        cls += ' bear';
+                        text = '🐻';
+                        title = '有熊在偷吃！快點擊趕走它！';
+                    } else if (plot.planted) {
+                        if (plot.ready) {
+                            cls += ' ready';
+                            text = this.seeds[plot.seedType].emoji;
+                            title = '點擊收穫！';
+                        } else {
+                            cls += ' planted';
+                            text = '🌱';
+                            title = '成長中...';
+                        }
+                    } else {
+                        text = '🟫';
+                        title = '點擊種植';
+                    }
+                    
+                    if (el.className !== cls) el.className = cls;
+                    if (el.textContent !== text) el.textContent = text;
+                    if (el.title !== title) el.title = title;
+                });
+
+                if (this.paused) {
+                    farmGrid.classList.add('paused-blur');
+                }
+            }
+            
+            renderShop() {
+                const seedShop = document.getElementById('seedShop');
+                seedShop.innerHTML = '';
+                
+                Object.entries(this.seeds).forEach(([key, seed]) => {
+                    const seedOption = document.createElement('div');
+                    seedOption.className = 'seed-option' + (this.selectedSeed === key ? ' selected' : '');
+                    seedOption.dataset.seed = key;
+                    const actualTime = (seed.time / this.speedMultiplier / 1000).toFixed(1);
+                    
+                    seedOption.innerHTML = `
+                        <div class="seed-name">${seed.emoji} ${seed.name}</div>
+                        <div class="seed-price">💰 ${this.formatNum(seed.price)} (賣${this.formatNum(seed.value)})</div>
+                        <div class="seed-time">⏰ ${actualTime}秒 ｜ ⭐+${seed.exp}</div>
+                    `;
+                    
+                    seedShop.appendChild(seedOption);
+                });
+            }
+            
+            updateUpgradeCosts() {
+                const plotBtn = document.getElementById('upgradePlots');
+                const speedBtn = document.getElementById('upgradeSpeed');
+
+                if (this.plotCount >= this.maxPlots) {
+                    plotBtn.textContent = `✅ 農田已滿 (${this.plotCount}/${this.maxPlots})`;
+                    plotBtn.disabled = true;
+                    plotBtn.classList.add('maxed');
+                } else {
+                    plotBtn.textContent = `➕ 擴展農田 ${this.plotCount}/${this.maxPlots} (💰${this.formatNum(this.plotUpgradeCost)})`;
+                    plotBtn.disabled = this.money < this.plotUpgradeCost || this.isSimulationStopped();
+                    plotBtn.classList.remove('maxed');
+                }
+
+                if (this.speedMultiplier >= this.maxSpeed) {
+                    speedBtn.textContent = `✅ 速度已封頂 (${this.speedMultiplier.toFixed(1)}x)`;
+                    speedBtn.disabled = true;
+                    speedBtn.classList.add('maxed');
+                } else {
+                    speedBtn.textContent = `⚡ 加快成長 ${this.speedMultiplier.toFixed(1)}x (💰${this.formatNum(this.speedUpgradeCost)})`;
+                    speedBtn.disabled = this.money < this.speedUpgradeCost || this.isSimulationStopped();
+                    speedBtn.classList.remove('maxed');
+                }
+            }
+            
+            bindEvents() {
+                document.getElementById('farmGrid').addEventListener('click', (e) => {
+                    const plotEl = e.target.closest('.plot');
+                    if (plotEl) {
+                        const index = parseInt(plotEl.dataset.index);
+                        this.handlePlotClick(index);
+                    }
+                });
+                
+                document.getElementById('seedShop').addEventListener('click', (e) => {
+                    const seedOption = e.target.closest('.seed-option');
+                    if (seedOption) {
+                        this.selectedSeed = seedOption.dataset.seed;
+                        this.renderShop();
+                    }
+                });
+                
+                document.getElementById('upgradePlots').addEventListener('click', () => this.upgradePlots());
+                document.getElementById('upgradeSpeed').addEventListener('click', () => this.upgradeSpeed());
+                document.getElementById('pauseBtn').addEventListener('click', () => this.togglePause());
+                document.getElementById('finishEndlessBtn').addEventListener('click', () => {
+                    this.triggerGameOver(true);
+                });
+
+                window.addEventListener('keydown', (e) => {
+                    if (e.key === 'p' || e.key === 'P' || e.code === 'Space') {
+                        if (!this.modalOpen && !this.gameOver) {
+                            e.preventDefault();
+                            this.togglePause();
+                        }
+                    }
+                });
+            }
+
+            togglePause() {
+                if (this.gameOver || this.modalOpen) return;
+                this.paused = !this.paused;
+                
+                const pauseBtn = document.getElementById('pauseBtn');
+                const farmGrid = document.getElementById('farmGrid');
+                const pauseBanner = document.getElementById('pauseBanner');
+                
+                if (this.paused) {
+                    pauseBtn.textContent = '▶️ 繼續遊戲 (P)';
+                    pauseBtn.classList.add('paused');
+                    farmGrid.classList.add('paused-blur');
+                    pauseBanner.classList.add('active');
+                    this.showMessage('⏸️ 遊戲已暫停，所有計時器已凍結。', 'info');
+                } else {
+                    pauseBtn.textContent = '⏸️ 暫停遊戲 (P)';
+                    pauseBtn.classList.remove('paused');
+                    farmGrid.classList.remove('paused-blur');
+                    pauseBanner.classList.remove('active');
+                    this.showMessage('▶️ 遊戲繼續！', 'success');
+                }
+                this.updateUpgradeCosts();
+            }
+            
+            handlePlotClick(index) {
+                if (this.isSimulationStopped()) return;
+                
+                if (this.wildBoar.present && this.wildBoar.targetPlots.includes(index)) {
+                    this.chaseBoarAway(index);
+                    return;
+                }
+                
+                if (this.bear.present && this.bear.targetPlot === index) {
+                    this.chaseBearAway();
+                    return;
+                }
+                
+                const plot = this.plots[index];
+                
+                if (plot.destroyed) {
+                    this.showMessage('這塊田地已被山豬破壞，無法使用！', 'error');
+                    return;
+                }
+                
+                if (!plot.planted) {
+                    this.plantSeed(index);
+                } else if (plot.ready) {
+                    this.harvest(index);
+                }
+            }
+            
+            plantSeed(index) {
+                const seed = this.seeds[this.selectedSeed];
+                
+                if (this.money < seed.price) {
+                    this.showMessage('金幣不足！可以先種便宜一點的作物週轉！', 'error');
+                    return;
+                }
+                
+                this.money -= seed.price;
+                const plot = this.plots[index];
+                plot.planted = true;
+                plot.seedType = this.selectedSeed;
+                plot.remainingMs = seed.time / this.speedMultiplier;
+                plot.ready = false;
+                
+                this.render();
+                this.showMessage(`種植了${seed.name}！`, 'success');
+            }
+            
+            harvest(index) {
+                const plot = this.plots[index];
+                const seed = this.seeds[plot.seedType];
+                
+                this.money += seed.value;
+                this.totalEarned += seed.value;
+                this.exp += seed.exp;
+                
+                plot.planted = false;
+                plot.seedType = null;
+                plot.remainingMs = 0;
+                plot.ready = false;
+                
+                this.showMessage(`收穫了${seed.name}！獲得 ${this.formatNum(seed.value)} 金幣與 ${seed.exp} 點經驗！`, 'success');
+                this.checkLevelUp();
+                this.render();
+            }
+            
+            checkLevelUp() {
+                let leveledUp = false;
+                while (this.exp >= this.expNeeded) {
+                    this.exp -= this.expNeeded;
+                    this.level++;
+                    this.expNeeded = this.level * 5;
+                    leveledUp = true;
+
+                    if (this.level >= 50 && !this.winterReached) {
+                        this.winterReached = true;
+                        this.updateStats();
+                        this.triggerWinterModal();
+                        return;
+                    }
+                }
+                if (leveledUp) {
+                    if (this.level === this.boarWarnLevel) {
+                        this.showMessage(`⚠️ 升上 ${this.level} 級！注意：25 級開始會有山豬出沒！`, 'error', 4000);
+                    } else if (this.level === this.boarStartLevel) {
+                        this.showMessage(`🚨 升上 ${this.level} 級！山豬開始出沒，趕走山豬可搶救 80% 種子費！`, 'error', 4500);
+                    } else {
+                        this.showMessage(`🎉 恭喜升級到 ${this.level} 級！`, 'success');
+                    }
+                }
+            }
+
+            triggerWinterModal() {
+                this.modalOpen = true;
+                this.bear.present = false;
+                this.bear.targetPlot = null;
+                this.wildBoar.present = false;
+                this.wildBoar.targetPlots = [];
+                this.render();
+
+                const overlay = document.createElement('div');
+                overlay.className = 'game-over-overlay';
+                
+                const modal = document.createElement('div');
+                modal.className = 'game-over-modal';
+                
+                modal.innerHTML = `
+                    <h2 class="victory-title">❄️ 冬天來臨了 ❄️</h2>
+                    <div class="winter-stamp">❄️ 完美過冬</div>
+                    <p style="font-size: 1.1em; color: #333; margin: 12px 0; line-height: 1.5; font-weight: bold;">
+                        冬天來臨了，熊跟野豬進入冬眠，<br>你成功守護了農田！
+                    </p>
+                    <div class="final-score" style="font-size: 1.1em;">
+                        達成等級: LV.${this.formatNum(this.level)}<br>
+                        現有金幣: ${this.formatNum(this.money)}<br>
+                        累計金幣: ${this.formatNum(this.totalEarned)}
+                    </div>
+                    <p style="color: #666; font-size: 0.95em; margin-bottom: 12px;">請問你要繼續玩無限模式，還是要結束？</p>
+                    <div>
+                        <button class="restart-btn endless-btn" id="btnContinueEndless">🌸 繼續玩無限模式</button>
+                        <button class="restart-btn" id="btnEndWinter">🏆 結束並結算成績</button>
+                    </div>
+                `;
+                
+                overlay.appendChild(modal);
+                document.body.appendChild(overlay);
+
+                document.getElementById('btnContinueEndless').addEventListener('click', () => {
+                    overlay.remove();
+                    this.startEndlessSpring();
+                });
+
+                document.getElementById('btnEndWinter').addEventListener('click', () => {
+                    overlay.remove();
+                    this.triggerGameOver(true);
+                });
+            }
+
+            startEndlessSpring() {
+                this.modalOpen = false;
+                this.endlessMode = true;
+                this.gracePeriodMs = 5000;
+                this.boarSpawnTimer = 0;
+                this.bearSpawnTimer = 0;
+
+                document.body.classList.add('spring-mode');
+                document.getElementById('finishEndlessBtn').style.display = 'inline-block';
+
+                this.showMessage('🌸 春天來了，飢餓的野豬們出來覓食了！（5秒後開始出沒）', 'error', 5000);
+                this.render();
+            }
+            
+            upgradePlots() {
+                if (this.isSimulationStopped() || this.plotCount >= this.maxPlots) return;
+                if (this.money >= this.plotUpgradeCost) {
+                    this.money -= this.plotUpgradeCost;
+                    const addCount = Math.min(2, this.maxPlots - this.plotCount);
+                    this.plotCount += addCount;
+                    this.plotUpgradeCost = Math.floor(this.plotUpgradeCost * 1.35);
+                    
+                    for (let i = 0; i < addCount; i++) {
+                        this.plots.push({
+                            planted: false,
+                            seedType: null,
+                            remainingMs: 0,
+                            ready: false,
+                            destroyed: false
+                        });
+                    }
+                    
+                    this.render();
+                    if (this.plotCount >= this.maxPlots) {
+                        this.showMessage(`🎉 農田已擴展至上限 ${this.maxPlots} 塊！`, 'success');
+                    } else {
+                        this.showMessage(`農田擴展成功！目前共有 ${this.plotCount} 塊農田！`, 'success');
+                    }
+                }
+            }
+            
+            upgradeSpeed() {
+                if (this.isSimulationStopped() || this.speedMultiplier >= this.maxSpeed) return;
+                if (this.money >= this.speedUpgradeCost) {
+                    this.money -= this.speedUpgradeCost;
+                    this.speedMultiplier = Math.min(this.maxSpeed, Math.round((this.speedMultiplier + 0.5) * 10) / 10);
+                    this.speedUpgradeCost = Math.floor(this.speedUpgradeCost * 1.25);
+                    
+                    this.render();
+                    if (this.speedMultiplier >= this.maxSpeed) {
+                        this.showMessage(`⚡ 作物成長速度已達最高極限 ${this.maxSpeed} 倍！`, 'success');
+                    } else {
+                        this.showMessage(`⚡ 作物成長速度提升至 ${this.speedMultiplier.toFixed(1)} 倍！`, 'success');
+                    }
+                }
+            }
+            
+            showMessage(text, type, duration = 3000) {
+                const messageEl = document.getElementById('message');
+                messageEl.textContent = text;
+                
+                if (type === 'success') {
+                    messageEl.style.background = '#D4EDDA';
+                    messageEl.style.color = '#155724';
+                    messageEl.style.borderColor = '#C3E6CB';
+                } else if (type === 'error') {
+                    messageEl.style.background = '#F8D7DA';
+                    messageEl.style.color = '#721C24';
+                    messageEl.style.borderColor = '#F5C6CB';
+                } else {
+                    messageEl.style.background = '#D1ECF1';
+                    messageEl.style.color = '#0C5460';
+                    messageEl.style.borderColor = '#BEE5EB';
+                }
+                
+                clearTimeout(this.msgTimeout);
+                this.msgTimeout = setTimeout(() => {
+                    if (this.paused) return;
+                    if (this.level >= this.boarWarnLevel && this.level < this.boarStartLevel) {
+                        messageEl.textContent = `⚠️ 警告：等級接近 ${this.boarStartLevel} 級，山豬群即將出沒！快存錢升級！`;
+                        messageEl.style.background = '#FFF3CD';
+                        messageEl.style.color = '#856404';
+                        messageEl.style.borderColor = '#FFEAA7';
+                    } else if (this.level >= this.boarStartLevel) {
+                        messageEl.textContent = '🚨 保持警戒：山豬隨時突襲！（及時趕走可救回 80% 種子費）';
+                        messageEl.style.background = '#FFF3CD';
+                        messageEl.style.color = '#856404';
+                        messageEl.style.borderColor = '#FFEAA7';
+                    } else {
+                        messageEl.textContent = '選擇種子並點擊農田來種植作物！';
+                        messageEl.style.background = '#FFF3CD';
+                        messageEl.style.color = '#856404';
+                        messageEl.style.borderColor = '#FFEAA7';
+                    }
+                }, duration);
+            }
+
+            startGameLoop() {
+                const tickRate = 100;
+                setInterval(() => {
+                    if (this.isSimulationStopped()) return;
+
+                    let needRender = false;
+
+                    // 1. 作物生長計時
+                    this.plots.forEach(plot => {
+                        if (plot.planted && !plot.ready) {
+                            plot.remainingMs -= tickRate;
+                            if (plot.remainingMs <= 0) {
+                                plot.ready = true;
+                                needRender = true;
+                                this.showMessage(`${this.seeds[plot.seedType].name}已經成熟了！`, 'success');
+                            }
+                        }
+                    });
+
+                    // 2. 春天 5 秒緩衝期
+                    if (this.gracePeriodMs > 0) {
+                        this.gracePeriodMs -= tickRate;
+                        if (this.gracePeriodMs <= 0) {
+                            this.spawnWildBoar();
+                        }
+                        if (needRender) this.render();
+                        return;
+                    }
+
+                    // 3. 熊的偷吃倒數與生成
+                    if (this.bear.present) {
+                        this.bear.remainingMs -= tickRate;
+                        if (this.bear.remainingMs <= 0) {
+                            this.bearStealsCrop();
+                            needRender = false;
+                        }
+                    } else if (!this.wildBoar.present) {
+                        this.bearSpawnTimer += tickRate;
+                        if (this.bearSpawnTimer >= 4000) {
+                            this.bearSpawnTimer = 0;
+                            this.checkBearAppearance();
+                        }
+                    }
+
+                    // 4. 山豬的破壞倒數與生成（25 級才開始，每波結束後固定 2 秒冷卻）
+                    if (this.wildBoar.present) {
+                        this.wildBoar.remainingMs -= tickRate;
+                        if (this.wildBoar.remainingMs <= 0) {
+                            this.wildBoarDestroysFarm();
+                            needRender = false;
+                        }
+                    } else if (this.level >= this.boarStartLevel) {
+                        this.boarSpawnTimer += tickRate;
+                        if (this.boarSpawnTimer >= 2000) {
+                            this.boarSpawnTimer = 0;
+                            this.checkWildBoarAttack();
+                        }
+                    }
+
+                    if (needRender) {
+                        this.render();
+                    }
+                }, tickRate);
+            }
+            
+            checkBearAppearance() {
+                if (this.bear.present || this.wildBoar.present) return;
+                
+                const baseChance = 0.18;
+                const levelBonus = this.level * 0.03;
+                const appearanceChance = Math.min(baseChance + levelBonus, 0.65);
+                
+                if (Math.random() < appearanceChance) {
+                    this.spawnBear();
+                }
+            }
+            
+            spawnBear() {
+                const plantedPlots = this.plots
+                    .map((plot, index) => ({ plot, index }))
+                    .filter(({ plot }) => plot.planted);
+                
+                if (plantedPlots.length === 0) return;
+                
+                const randomPlot = plantedPlots[Math.floor(Math.random() * plantedPlots.length)];
+                
+                this.bear.present = true;
+                this.bear.targetPlot = randomPlot.index;
+                this.bear.remainingMs = 5000;
+                
+                this.render();
+                this.showMessage('🐻 有熊跑進農場偷吃作物！快點擊趕走它！', 'error');
+            }
+            
+            chaseBearAway() {
+                this.bear.present = false;
+                this.bear.targetPlot = null;
+                
+                this.exp += 2;
+                this.showMessage('🎉 成功趕走了熊！獲得 2 點經驗值！', 'success');
+                this.checkLevelUp();
+                this.render();
+            }
+            
+            bearStealsCrop() {
+                const targetPlot = this.plots[this.bear.targetPlot];
+                const seedType = targetPlot ? targetPlot.seedType : null;
+                
+                if (!targetPlot || !targetPlot.planted || !seedType) {
+                    this.bear.present = false;
+                    this.bear.targetPlot = null;
+                    this.render();
+                    return;
+                }
+                
+                targetPlot.planted = false;
+                targetPlot.seedType = null;
+                targetPlot.remainingMs = 0;
+                targetPlot.ready = false;
+                
+                this.bear.present = false;
+                this.bear.targetPlot = null;
+                
+                this.render();
+                this.showMessage(`😱 熊偷走了你的${this.seeds[seedType].name}！`, 'error');
+            }
+            
+            checkWildBoarAttack() {
+                if (this.wildBoar.present) return;
+                
+                // 25 級開始：25級 18% 機率，每級 +6%，最高 80%
+                const boarChance = Math.min(0.18 + (this.level - this.boarStartLevel) * 0.06, 0.80);
+                
+                if (Math.random() < boarChance) {
+                    this.spawnWildBoar();
+                }
+            }
+            
+            spawnWildBoar() {
+                const availablePlots = this.plots
+                    .map((plot, index) => ({ plot, index }))
+                    .filter(({ plot }) => !plot.destroyed)
+                    .map(({ index }) => index);
+                
+                if (availablePlots.length <= 3) {
+                    this.triggerGameOver(this.winterReached);
+                    return;
+                }
+                
+                // 25級剛出沒時只有 2 隻山豬，之後每 5 級才 +1 隻，單波上限最多 10 隻
+                const baseAttack = 2;
+                const levelBonus = Math.floor(Math.max(0, this.level - this.boarStartLevel) / 5);
+                const attackCount = Math.min(baseAttack + levelBonus, 10, availablePlots.length - 3);
+                
+                const targetPlots = [];
+                for (let i = 0; i < attackCount; i++) {
+                    const randomIndex = Math.floor(Math.random() * availablePlots.length);
+                    targetPlots.push(availablePlots.splice(randomIndex, 1)[0]);
+                }
+                
+                this.wildBoar.present = true;
+                this.wildBoar.targetPlots = targetPlots;
+                this.wildBoar.remainingMs = 8000;
+                
+                this.render();
+                this.showMessage(`🐗💥 ${attackCount}隻山豬群突襲！！！快速點擊驅趕它們！`, 'error');
+            }
+            
+            chaseBoarAway(plotIndex) {
+                const index = this.wildBoar.targetPlots.indexOf(plotIndex);
+                if (index > -1) {
+                    this.wildBoar.targetPlots.splice(index, 1);
+                    this.exp += 4;
+                    
+                    const plot = this.plots[plotIndex];
+                    let refundMsg = '';
+
+                    // 若該格有種作物，趕走山豬時可搶救回 80% 種子費（若已成熟則退還 100% 成本），避免破產
+                    if (plot.planted && plot.seedType) {
+                        const seed = this.seeds[plot.seedType];
+                        const refundRate = plot.ready ? 1.0 : 0.8;
+                        const refund = Math.floor(seed.price * refundRate);
+                        this.money += refund;
+
+                        plot.planted = false;
+                        plot.seedType = null;
+                        plot.remainingMs = 0;
+                        plot.ready = false;
+                        refundMsg = `（${seed.name}被踩壞，但成功搶救回 💰${this.formatNum(refund)} 種子費！）`;
+                    }
+                    
+                    if (this.wildBoar.targetPlots.length === 0) {
+                        this.wildBoar.present = false;
+                        this.boarSpawnTimer = 0; // 重置 2 秒冷卻
+                        this.showMessage(`🎉 成功驅趕所有山豬！${refundMsg}`, 'success');
+                    } else if (refundMsg) {
+                        this.showMessage(`🐗 趕走了一隻山豬！${refundMsg}`, 'info');
+                    }
+                    
+                    this.checkLevelUp();
+                    this.render();
+                }
+            }
+            
+            wildBoarDestroysFarm() {
+                let destroyedCount = 0;
+                
+                this.wildBoar.targetPlots.forEach(plotIndex => {
+                    const plot = this.plots[plotIndex];
+                    plot.planted = false;
+                    plot.seedType = null;
+                    plot.remainingMs = 0;
+                    plot.ready = false;
+                    plot.destroyed = true;
+                    
+                    destroyedCount++;
+                    this.wildBoar.destructionCount++;
+                });
+                
+                this.wildBoar.present = false;
+                this.wildBoar.targetPlots = [];
+                this.boarSpawnTimer = 0;
+                
+                const workingPlots = this.plots.filter(plot => !plot.destroyed).length;
+                
+                if (workingPlots <= 3) {
+                    this.triggerGameOver(this.winterReached);
+                } else {
+                    this.showMessage(`💥 山豬破壞了 ${destroyedCount} 塊農田！剩餘可用農田: ${workingPlots}`, 'error');
+                    this.render();
+                }
+            }
+            
+            triggerGameOver(isWinterCleared = false) {
+                this.gameOver = true;
+                this.modalOpen = true;
+                this.saveScore(isWinterCleared);
+                this.showGameOverScreen(isWinterCleared);
+            }
+            
+            saveScore(isWinterCleared) {
+                let scores = JSON.parse(localStorage.getItem('farmGameScores') || '[]');
+                const recordedCoins = this.totalEarned > 0 ? this.totalEarned : this.money;
+                const newScore = {
+                    score: recordedCoins,
+                    earned: recordedCoins,
+                    money: this.money,
+                    level: this.level,
+                    winterCleared: isWinterCleared,
+                    date: new Date().toLocaleDateString()
+                };
+                
+                scores.push(newScore);
+                scores.sort((a, b) => (b.earned ?? b.score) - (a.earned ?? a.score) || b.level - a.level);
+                this.finalRank = scores.indexOf(newScore) + 1;
+                scores = scores.slice(0, 10);
+                
+                localStorage.setItem('farmGameScores', JSON.stringify(scores));
+            }
+            
+            showGameOverScreen(isWinterCleared) {
+                const overlay = document.createElement('div');
+                overlay.className = 'game-over-overlay';
+                
+                const modal = document.createElement('div');
+                modal.className = 'game-over-modal';
+                
+                const scores = JSON.parse(localStorage.getItem('farmGameScores') || '[]');
+                const rank = this.finalRank;
+                const recordedCoins = this.totalEarned > 0 ? this.totalEarned : this.money;
+                
+                modal.innerHTML = `
+                    <h2 class="${isWinterCleared ? 'victory-title' : 'game-over-title'}">
+                        ${isWinterCleared ? '🎉 守護農田結算 🎉' : '🐗 GAME OVER 🐗'}
+                    </h2>
+                    ${isWinterCleared ? '<div class="winter-stamp">❄️ 完美過冬</div>' : '<p>農場只剩 3 塊田地，無法維持營運...</p>'}
+                    <div class="final-score">
+                        達到等級: LV.${this.formatNum(this.level)}
+                        <br>累計金幣: ${this.formatNum(recordedCoins)}
+                        <br>剩餘金幣: ${this.formatNum(this.money)}
+                        <br>排行榜名次: ${rank <= 10 ? '#' + rank : '未進前 10 名'}
+                    </div>
+                    
+                    <div class="leaderboard">
+                        <h4>🏆 歷史排行榜 (依累計金幣)</h4>
+                        ${scores.slice(0, 5).map((s, index) => {
+                            const coins = s.earned ?? s.score;
+                            const stamp = s.winterCleared ? '❄️' : '';
+                            return `
+                                <div class="score-entry ${index + 1 === rank ? 'current-score' : ''}">
+                                    <span>#${index + 1} LV.${this.formatNum(s.level)} ${stamp}</span>
+                                    <span>💰 ${this.formatNum(coins)} 金幣</span>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                    
+                    <button class="restart-btn" onclick="location.reload()">🔄 重新開始</button>
+                    <button class="restart-btn" onclick="this.closest('.game-over-overlay').remove()">📊 查看農場</button>
+                `;
+                
+                overlay.appendChild(modal);
+                document.body.appendChild(overlay);
+            }
+        }
+        
+        window.addEventListener('DOMContentLoaded', () => {
+            new FarmGame();
+        });
+    </script>
+</body>
+</html>
